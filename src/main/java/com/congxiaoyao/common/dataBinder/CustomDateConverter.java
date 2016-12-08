@@ -38,7 +38,8 @@ public class CustomDateConverter implements Converter<String, Date> {
 	}
 
 	private void sort(int[] array) {
-		quickSort(0, array.length - 1, array);
+//		quickSort(0, array.length - 1, array);
+		Arrays.sort(array);
 	}
 
 	public static void quickSort(int startIndex, int endIndex, int[] array) {
