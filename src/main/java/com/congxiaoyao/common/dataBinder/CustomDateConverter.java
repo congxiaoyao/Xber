@@ -7,7 +7,6 @@ import org.springframework.core.convert.converter.Converter;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Random;
-
 /**
  * 日期转换器
  */
@@ -31,7 +30,7 @@ public class CustomDateConverter implements Converter<String, Date> {
 		} catch (Exception e) {
 			e.printStackTrace();
             if (logger.isWarnEnabled()) {
-                logger.warn("日期转换出错，", e);
+                logger.warn("日期转换出错", e);
             }
         }
 		
