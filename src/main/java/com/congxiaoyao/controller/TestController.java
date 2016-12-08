@@ -13,6 +13,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
     @RequestMapping(value = "test", method = RequestMethod.POST)
     public TestPO echo(@RequestBody TestPO testPO) {
-        return testPO;
+        return testPO;//echo
     }
 }
