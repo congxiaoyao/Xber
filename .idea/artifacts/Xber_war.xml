@@ -1,0 +1,8 @@
+<component name="ArtifactManager">
+  <artifact type="war" name="Xber:war">
+    <output-path>$PROJECT_DIR$/target</output-path>
+    <root id="archive" name="Xber.war">
+      <element id="artifact" artifact-name="Xber:war exploded" />
+    </root>
+  </artifact>
+</component>
