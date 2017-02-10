@@ -1,4 +1,4 @@
-package com.congxiaoyao.pojo;
+package com.congxiaoyao.test.pojo;
 
 /**
  * Created by Jaycejia on 2016/12/8.
