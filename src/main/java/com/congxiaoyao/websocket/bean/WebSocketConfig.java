@@ -18,7 +18,9 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/gs-guide-websocket").withSockJS().setInterceptors(new WebSocketHandshakeInterceptor());
+        registry.addEndpoint("/websocket-handshake")
+                .withSockJS();
+//                .addInterceptors(new WebSocketHandshakeInterceptor());
     }
 
 }

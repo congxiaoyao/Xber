@@ -1,5 +1,6 @@
-package com.congxiaoyao.websocket.controller;
+package com.congxiaoyao.websocket.bean;
 
+import com.congxiaoyao.location.pojo.GpsSampleOuterClass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.congxiaoyao.location.pojo.GpsSampleOuterClass.GpsSample;
 /**
  * Created by Jaycejia on 2017/2/10.
  */
@@ -21,17 +23,18 @@ public class WebSocketController {
 
     @MessageMapping("/hello")
     @SendTo("/topic/echo")
-    public String greetings(String message) {
+    public String greeting(String message) throws Exception {
         logger.info("received: " + message);
-        return message;
+//        GpsSample gpsSample = GpsSample.parseFrom(message.getBytes());
+        return "ok";
     }
 
-    @RequestMapping(value = "/sendTest", method = RequestMethod.GET)
-    public void sendTest(String content) {
-        logger.info("invoked: " + content);
-        simpMessagingTemplate.convertAndSend("/topic/echo", content);
-        simpMessagingTemplate.convertAndSend("/topic/echo1", content);
-        simpMessagingTemplate.convertAndSend("/topic/echo2", content);
-        simpMessagingTemplate.convertAndSend("/topic/echo3", content);
-    }
+//    @RequestMapping(value = "/sendTest", method = RequestMethod.GET)
+//    public void sendTest(String content) {
+//        logger.info("invoked: " + content);
+//        simpMessagingTemplate.convertAndSend("/topic/echo", content);
+//        simpMessagingTemplate.convertAndSend("/topic/echo1", content);
+//        simpMessagingTemplate.convertAndSend("/topic/echo2", content);
+//        simpMessagingTemplate.convertAndSend("/topic/echo3", content);
+//    }
 }
