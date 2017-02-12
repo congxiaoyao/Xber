@@ -219,6 +219,11 @@
             <artifactId>logback-ext-spring</artifactId>
             <version>0.1.4</version>
         </dependency>
+        <dependency>
+            <groupId>org.codehaus.janino</groupId>
+            <artifactId>janino</artifactId>
+            <version>3.0.6</version>
+        </dependency>
         <!-- jackson -->
         <dependency>
             <groupId>org.codehaus.jackson</groupId>

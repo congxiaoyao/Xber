@@ -3,6 +3,7 @@ package com.congxiaoyao.location.manager;
 import com.infomatiq.jsi.Point;
 import com.infomatiq.jsi.Rectangle;
 import com.infomatiq.jsi.rtree.RTree;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -18,7 +19,8 @@ import static com.congxiaoyao.location.pojo.GpsSampleOuterClass.GpsSample;
 /**
  * Created by congxiaoyao on 2017/2/9.
  */
-public class GpsSampleCache {
+@Component("gpsSampleCache")
+public class GpsSampleCache implements IGpsSampleCache{
 
     private RTree rTree;
     private ConcurrentMap<Integer, PointSet> latestData;
@@ -26,20 +28,22 @@ public class GpsSampleCache {
 
     private int expired;        //过期时间 毫秒
 
-    public static GpsSampleCache getDefaultCache() {
-        return CacheHolder.cache;
+    public GpsSampleCache() {
+        init(5000);
     }
 
-    private GpsSampleCache(int expired) {
+    public GpsSampleCache(int expired) {
         if(expired <= 0) throw new RuntimeException("过期时间不能小于0");
+        init(expired);
+    }
+
+    private void init(int expired) {
         this.expired = expired;
 
         rTree = new RTree();
         rTree.init(null);
         latestData = new ConcurrentHashMap<>();
-
         lock = new ReentrantLock(false);
-
     }
 
     /**
@@ -47,6 +51,7 @@ public class GpsSampleCache {
      *
      * @param point
      */
+    @Override
     public void put(GpsSample point) {
         //暂不支持过大的carId
         checkCarIdAndThrow(point.getCarId());
@@ -86,11 +91,17 @@ public class GpsSampleCache {
         lock.unlock();
     }
 
+    @Override
+    public void clearExpired() {
+
+    }
+
     /**
      * 清除某个car的缓存轨迹
      *
      * @param carId
      */
+    @Override
     public void clear(long carId) {
         checkCarIdAndThrow(carId);
         int intCarID = (int) carId;
@@ -113,24 +124,27 @@ public class GpsSampleCache {
      * @param d   在半径为d的范围内
      * @return 关于符合条件的PointSet的List 也就是关于GPSSample[]的List
      */
-    public List<GpsSample[]> nearestN(float lng, float lat, int n, float d) {
+    @Override
+    public List<GpsSample[]> nearestN(double lng, double lat, int n, double d) {
         lock.lock();
         List<GpsSample[]> list = new ArrayList<>(n);
-        rTree.nearestNUnsorted(new Point(lng, lat), carId -> {
+        rTree.nearestNUnsorted(new Point((float) lng, (float) lat), carId -> {
             PointSet pointSet = latestData.get(carId);
             if (pointSet != null) {
                 list.add(pointSet.getPath());
             }
             return true;
-        }, n, d);
+        }, n, (float) d);
         lock.unlock();
         return list;
     }
 
+    @Override
     public void setExpired(int expired) {
         this.expired = expired;
     }
 
+    @Override
     public int getExpired() {
         return expired;
     }
@@ -141,9 +155,6 @@ public class GpsSampleCache {
         }
     }
 
-    private static class CacheHolder {
-        private static GpsSampleCache cache = new GpsSampleCache(5000);
-    }
 
     /**
      * 对于每一辆车 最近{@link GpsSampleCache#expired}时间内的点都会存放在PointSet中
@@ -307,9 +318,5 @@ public class GpsSampleCache {
         protected void beforeUnlockRead(Rectangle result) {
 
         }
-    }
-
-    protected void afterUpdatePoint(GpsSample point) {
-
     }
 }
