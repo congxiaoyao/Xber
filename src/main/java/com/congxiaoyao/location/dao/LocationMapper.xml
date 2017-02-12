@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.congxiaoyao.location.dao.LocationMapper">
+	<resultMap id="gpsSampleMap" type="com.congxiaoyao.location.pojo.GpsSamplePo">
+        <id property="traceId" column="trace_id"/>
+        <result property="carId" column="car_id"/>
+        <result property="actionId" column="action_id"/>
+        <result property="vLat" column="v_lat"/>
+        <result property="vLong" column="v_long"/>
+        <result property="latitude" column="latitude"/>
+        <result property="longitude" column="longitude"/>
+        <result property="time" column="time"/>
+	</resultMap>
+    <select id="getAllSample" resultMap="gpsSampleMap">
+        SELECT * FROM tab_position_trace
+    </select>
+    <insert id="insertSample" parameterType="com.congxiaoyao.location.pojo.GpsSamplePo">
+        INSERT INTO tab_position_trace (
+            car_id,
+            action_id,
+            latitude,
+            longitude,
+            v_lat,
+            v_long,
+            time
+        )
+        VALUES (
+            #{carId},
+            #{actionId},
+            #{latitude},
+            #{longitude},
+            #{vLat},
+            #{vLong},
+            #{time}
+        );
+
+    </insert>
+</mapper>

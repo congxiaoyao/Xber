@@ -6,8 +6,13 @@
         <encoder>
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
         </encoder>
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>return logger.contains("Mapper");</expression>
+            </evaluator>
+            <OnMismatch>ACCEPT</OnMismatch>
+            <OnMatch>DENY</OnMatch>
+            <level>DEBUG</level>
         </filter>
     </appender>
 
@@ -29,8 +34,10 @@
     <logger name="org.springframework" level="INFO"/>
     <logger name="org.quartz" level="INFO"/>
     <logger name="org.apache.shiro.cache.ehcache.EhCacheManager" level="WARN"/>
+    <logger name="com.congxiaoyao.**.dao" level="INFO"/>
+    <logger name="org.mybatis" level="INFO"/>
 
-    <root level="INFO">
+    <root level="DEBUG">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="FILE_LOG"/>
     </root>
