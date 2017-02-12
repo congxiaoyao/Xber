@@ -25,9 +25,10 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             return false;
         }
         try {
-            StatelessAuthcFilter.checkToken(tokens.get(1));
+            StatelessAuthcFilter.checkToken(tokens.get(0));
             return true;
         } catch (Exception e) {
+            logger.debug("authenticate error, " + e);
             return false;
         }
     }
