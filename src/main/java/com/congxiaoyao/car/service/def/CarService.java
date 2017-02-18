@@ -32,5 +32,5 @@ public interface CarService {
      * @param endTime
      * @return
      */
-    List<CarDetail> getFreeCars(Date startTime, Date endTime, Integer status);
+    List<CarDetail> getCars(Date startTime, Date endTime, Integer status);
 }

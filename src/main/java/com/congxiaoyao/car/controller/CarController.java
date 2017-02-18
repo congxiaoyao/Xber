@@ -2,7 +2,6 @@ package com.congxiaoyao.car.controller;
 
 import com.congxiaoyao.car.pojo.CarDetail;
 import com.congxiaoyao.car.service.def.CarService;
-import com.congxiaoyao.user.pojo.BasicUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -39,7 +38,7 @@ public class CarController {
      * @return
      */
     public List<CarDetail> getCars(Date startTime, Date endTime, Integer status) {
-        return carService.getFreeCars(startTime, endTime, status);
+        return carService.getCars(startTime, endTime, status);
     }
 }
 

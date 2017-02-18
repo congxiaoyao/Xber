@@ -50,7 +50,7 @@ public class CarServiceImpl implements CarService {
      * @return
      */
     @Override
-    public List<CarDetail> getFreeCars(Date startTime, Date endTime, Integer status) {
+    public List<CarDetail> getCars(Date startTime, Date endTime, Integer status) {
         return null;
     }
 }
