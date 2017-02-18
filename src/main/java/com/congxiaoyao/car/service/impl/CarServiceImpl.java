@@ -1,8 +1,10 @@
 package com.congxiaoyao.car.service.impl;
 
 import com.congxiaoyao.car.dao.CarUserMapper;
+import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
 import com.congxiaoyao.car.service.def.CarService;
+import com.congxiaoyao.location.dao.LocationMapper;
 import com.congxiaoyao.user.pojo.BasicUserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,6 +21,16 @@ import java.util.List;
 public class CarServiceImpl implements CarService {
     @Autowired
     private CarUserMapper carUserMapper;
+
+    /**
+     * 获取所有未绑司机车辆
+     *
+     * @return
+     */
+    @Override
+    public List<Car> getCarsWithoutDriver() {
+        return carUserMapper.selectCarsWithoutDriver();
+    }
 
     /**
      * 根据车辆Id查询司机用户详情
@@ -39,18 +51,62 @@ public class CarServiceImpl implements CarService {
      */
     @Override
     public CarDetail getCarInfo(Long carId) {
-        return carUserMapper.selectCarInfobyCarId(carId);
+        return carUserMapper.selectCarInfoByCarId(carId);
     }
     /**
      * 获取车辆列表
      *
      * @param startTime
      * @param endTime
-     * @param status
      * @return
      */
     @Override
-    public List<CarDetail> getCars(Date startTime, Date endTime, Integer status) {
-        return null;
+    public List<CarDetail> getFreeCars(Date startTime, Date endTime) {
+        return carUserMapper.selectFreeCars(startTime, endTime);
+    }
+
+    /**
+     * 根据始发目的地，获取正在执行任务的车辆列表
+     *
+     * @param startSpot
+     * @param endSpot
+     * @return
+     */
+    @Override
+    public List<CarDetail> getCarsOnTask(Long startSpot, Long endSpot) {
+        return carUserMapper.selectCarsOnMission(startSpot, endSpot, new Date());
+    }
+
+    /**
+     * 根据车牌号查
+     *
+     * @param plate
+     * @return
+     */
+    @Override
+    public List<CarDetail> getCarsByPlate(String plate) {
+        return carUserMapper.selectCarsByPlate(plate);
+    }
+
+    /**
+     * 根据用户的名字查询车辆
+     *
+     * @param name
+     * @return
+     */
+    @Override
+    public List<CarDetail> getCarsByUserName(String name) {
+        return carUserMapper.selectCarsByUserName(name);
+    }
+
+    /**
+     * 设置车辆司机
+     *
+     * @param carId
+     * @param userId
+     */
+    @Override
+    public void changeCarDriver(Long carId, Long userId) {
+        carUserMapper.updateCarUser(carId, userId);
     }
 }

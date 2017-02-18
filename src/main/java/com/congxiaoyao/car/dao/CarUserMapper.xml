@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.congxiaoyao.car.dao.CarUserMapper">
-    <resultMap id="BaseResultMap" type="com.congxiaoyao.user.pojo.BasicUserInfo">
+    <resultMap id="BasicUserMap" type="com.congxiaoyao.user.pojo.BasicUserInfo">
         <id column="user_id" property="userId"/>
         <result column="name" property="name"/>
         <result column="gender" property="gender"/>
@@ -13,22 +13,31 @@
         <id column="car_id" property="carId"/>
         <result column="plate_no" property="plate"/>
         <result column="spec" property="spec"/>
-        <association property="userInfo" resultMap="BaseResultMap"/>
+        <association property="userInfo" resultMap="BasicUserMap"/>
+    </resultMap>
+    <resultMap id="CarMap" type="com.congxiaoyao.car.pojo.Car">
+        <id column="car_id" property="carId"/>
+        <result column="plate_no" property="plate"/>
+        <result column="spec" property="spec"/>
     </resultMap>
 
     <sql id="Base_Column_List">
-        user_id, name, gender, avatar, age
+        u.user_id, name, gender, avatar, age
     </sql>
-    <select id="selectUserByCarId" resultMap="BaseResultMap">
+    <select id="selectCarsWithoutDriver" resultMap="CarMap">
+        SELECT car_id,plate_no,spec
+        FROM tab_car
+        WHERE user_id IS NULL
+    </select>
+    <select id="selectUserByCarId" resultMap="BasicUserMap">
         SELECT
         <include refid="Base_Column_List"/>
-        FROM tab_user u JOIN tab_car c ON u.user_id = c.user_id
+        FROM tab_user u JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
         WHERE car_id = #{carId}
     </select>
-
-    <select id="selectCarInfobyCarId" resultMap="CarDetailMap">
+    <select id="selectCarInfoByCarId" resultMap="CarDetailMap">
         SELECT
-            car_id,
+            c.car_id,
             plate_no,
             spec,
             c.user_id,
@@ -37,7 +46,92 @@
             avatar,
             age
         FROM tab_user u
-            JOIN tab_car c ON u.user_id = c.user_id
+            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
         WHERE car_id = #{carId};
     </select>
+    <select id="selectFreeCars" resultMap="CarDetailMap">
+        SELECT DISTINCT
+            c.car_id,
+            plate_no,
+            spec,
+            c.user_id,
+            NAME,
+            gender,
+            avatar,
+            age
+        FROM
+            tab_user u
+            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
+            LEFT JOIN (
+                          SELECT *
+                          FROM
+                              tab_task
+                          WHERE
+                              #{startTime} NOT BETWEEN start_time
+                              AND end_time
+                              AND #{endTime} NOT BETWEEN start_time
+                              AND end_time
+                              AND `status` = #{status}
+                      ) t ON c.car_id = t.car_id
+    </select>
+    <select id="selectCarsOnMission" resultMap="CarDetailMap">
+        SELECT
+        c.car_id,
+        plate_no,
+        spec,
+        c.user_id,
+        NAME,
+        gender,
+        avatar,
+        age
+        FROM tab_user u
+        JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
+        LEFT JOIN (
+        SELECT *
+        FROM
+        tab_task
+        WHERE
+        #{currentTime} BETWEEN start_time
+        AND end_time AND `status` = 1
+        <if test="startSpot != null">
+            AND tab_task.start_spot = #{startSpot}
+        </if>
+        <if test="endSpot != null">
+            AND tab_task.end_spot = #{endSpot}
+        </if>
+        ) t ON c.car_id = t.car_id
+    </select>
+    <select id="selectCarsByPlate" resultMap="CarDetailMap">
+        SELECT
+            c.car_id,
+            plate_no,
+            spec,
+            c.user_id,
+            NAME,
+            gender,
+            avatar,
+            age
+        FROM tab_user u
+            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
+        WHERE plate_no LIKE CONCAT('%', #{plate}, '%')
+    </select>
+    <select id="selectCarsByUserName" resultMap="CarDetailMap">
+        SELECT
+            c.car_id,
+            plate_no,
+            spec,
+            c.user_id,
+            NAME,
+            gender,
+            avatar,
+            age
+        FROM tab_user u
+            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
+        WHERE u.name LIKE CONCAT('%', #{name}, '%')
+    </select>
+    <update id="updateCarUser">
+        UPDATE tab_car
+        SET user_id = #{userId}
+        WHERE car_id = #{carId}
+    </update>
 </mapper>

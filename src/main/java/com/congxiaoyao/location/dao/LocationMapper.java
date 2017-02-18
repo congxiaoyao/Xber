@@ -10,5 +10,7 @@ import java.util.List;
 public interface LocationMapper {
     List<GpsSamplePo> getAllSample();
 
+    List<GpsSamplePo> getTrace(Long taskId);
+
     void insertSample(GpsSamplePo samplePo);
 }

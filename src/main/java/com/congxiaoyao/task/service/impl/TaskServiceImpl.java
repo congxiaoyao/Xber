@@ -2,6 +2,8 @@ package com.congxiaoyao.task.service.impl;
 
 import com.congxiaoyao.car.dao.CarUserMapper;
 import com.congxiaoyao.common.URIConfig;
+import com.congxiaoyao.location.dao.LocationMapper;
+import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.task.dao.TaskDetailMapper;
 import com.congxiaoyao.task.dao.TaskMapper;
 import com.congxiaoyao.task.pojo.LaunchTaskRequest;
@@ -32,6 +34,8 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     private CarUserMapper carUserMapper;
     @Autowired
+    private LocationMapper locationMapper;
+    @Autowired
     private SimpMessagingTemplate messagingTemplate;
 
     /**
@@ -43,7 +47,7 @@ public class TaskServiceImpl implements TaskService {
      */
     @Override
     public List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp) {
-        return detailMapper.selectByCondition(userId, pageIndex, pageSize, status, timestamp);
+        return detailMapper.selectByCondition(userId, pageIndex * pageSize, pageSize, status, timestamp);
     }
 
     /**
@@ -66,6 +70,8 @@ public class TaskServiceImpl implements TaskService {
             logger.debug("Task {} has changed to status:{}", taskId, status);
         }
         taskMapper.updateByPrimaryKeySelective(task);
+        //通知管理员状态变化
+        messagingTemplate.convertAndSend(URIConfig.TASK_STATUS_CHANGE, task);
     }
 
     /**
@@ -87,5 +93,17 @@ public class TaskServiceImpl implements TaskService {
         //推送给特定用户
         BasicUserInfo userInfo = carUserMapper.selectUserByCarId(task.getCarId());
         messagingTemplate.convertAndSendToUser(userInfo.getUserId().toString(), URIConfig.USER_SYSTEM, 1);
+    }
+
+
+    /**
+     * 根据任务id获取车辆轨迹
+     *
+     * @param taskId
+     * @return
+     */
+    @Override
+    public List<GpsSamplePo> getTrace(Long taskId) {
+        return locationMapper.getTrace(taskId);
     }
 }

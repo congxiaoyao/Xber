@@ -1,8 +1,6 @@
 package com.congxiaoyao.user.pojo;
 
-import java.io.Serializable;
-
-public class User implements Serializable{
+public class User {
     private Long userId;
 
     private String username;
@@ -18,6 +16,8 @@ public class User implements Serializable{
     private String avatar;
 
     private Integer age;
+
+    private Byte userType;
 
     public Long getUserId() {
         return userId;
@@ -81,5 +81,13 @@ public class User implements Serializable{
 
     public void setAge(Integer age) {
         this.age = age;
+    }
+
+    public Byte getUserType() {
+        return userType;
+    }
+
+    public void setUserType(Byte userType) {
+        this.userType = userType;
     }
 }

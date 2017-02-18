@@ -47,14 +47,9 @@ public final class GpsSampleOuterClass {
     long getTime();
 
     /**
-     * <code>optional string actionId = 7;</code>
+     * <code>optional int64 taskId = 7;</code>
      */
-    String getActionId();
-    /**
-     * <code>optional string actionId = 7;</code>
-     */
-    com.google.protobuf.ByteString
-        getActionIdBytes();
+    long getTaskId();
   }
   /**
    * Protobuf type {@code GpsSample}
@@ -74,7 +69,7 @@ public final class GpsSampleOuterClass {
       vlat_ = 0D;
       carId_ = 0L;
       time_ = 0L;
-      actionId_ = "";
+      taskId_ = 0L;
     }
 
     @Override
@@ -132,10 +127,9 @@ public final class GpsSampleOuterClass {
               time_ = input.readInt64();
               break;
             }
-            case 58: {
-              String s = input.readStringRequireUtf8();
+            case 56: {
 
-              actionId_ = s;
+              taskId_ = input.readInt64();
               break;
             }
           }
@@ -215,38 +209,13 @@ public final class GpsSampleOuterClass {
       return time_;
     }
 
-    public static final int ACTIONID_FIELD_NUMBER = 7;
-    private volatile Object actionId_;
+    public static final int TASKID_FIELD_NUMBER = 7;
+    private long taskId_;
     /**
-     * <code>optional string actionId = 7;</code>
+     * <code>optional int64 taskId = 7;</code>
      */
-    public String getActionId() {
-      Object ref = actionId_;
-      if (ref instanceof String) {
-        return (String) ref;
-      } else {
-        com.google.protobuf.ByteString bs = 
-            (com.google.protobuf.ByteString) ref;
-        String s = bs.toStringUtf8();
-        actionId_ = s;
-        return s;
-      }
-    }
-    /**
-     * <code>optional string actionId = 7;</code>
-     */
-    public com.google.protobuf.ByteString
-        getActionIdBytes() {
-      Object ref = actionId_;
-      if (ref instanceof String) {
-        com.google.protobuf.ByteString b = 
-            com.google.protobuf.ByteString.copyFromUtf8(
-                (String) ref);
-        actionId_ = b;
-        return b;
-      } else {
-        return (com.google.protobuf.ByteString) ref;
-      }
+    public long getTaskId() {
+      return taskId_;
     }
 
     private byte memoizedIsInitialized = -1;
@@ -279,8 +248,8 @@ public final class GpsSampleOuterClass {
       if (time_ != 0L) {
         output.writeInt64(6, time_);
       }
-      if (!getActionIdBytes().isEmpty()) {
-        com.google.protobuf.GeneratedMessageV3.writeString(output, 7, actionId_);
+      if (taskId_ != 0L) {
+        output.writeInt64(7, taskId_);
       }
     }
 
@@ -313,8 +282,9 @@ public final class GpsSampleOuterClass {
         size += com.google.protobuf.CodedOutputStream
           .computeInt64Size(6, time_);
       }
-      if (!getActionIdBytes().isEmpty()) {
-        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(7, actionId_);
+      if (taskId_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(7, taskId_);
       }
       memoizedSize = size;
       return size;
@@ -352,8 +322,8 @@ public final class GpsSampleOuterClass {
           == other.getCarId());
       result = result && (getTime()
           == other.getTime());
-      result = result && getActionId()
-          .equals(other.getActionId());
+      result = result && (getTaskId()
+          == other.getTaskId());
       return result;
     }
 
@@ -382,8 +352,9 @@ public final class GpsSampleOuterClass {
       hash = (37 * hash) + TIME_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getTime());
-      hash = (37 * hash) + ACTIONID_FIELD_NUMBER;
-      hash = (53 * hash) + getActionId().hashCode();
+      hash = (37 * hash) + TASKID_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getTaskId());
       hash = (29 * hash) + unknownFields.hashCode();
       memoizedHashCode = hash;
       return hash;
@@ -514,7 +485,7 @@ public final class GpsSampleOuterClass {
 
         time_ = 0L;
 
-        actionId_ = "";
+        taskId_ = 0L;
 
         return this;
       }
@@ -544,7 +515,7 @@ public final class GpsSampleOuterClass {
         result.vlat_ = vlat_;
         result.carId_ = carId_;
         result.time_ = time_;
-        result.actionId_ = actionId_;
+        result.taskId_ = taskId_;
         onBuilt();
         return result;
       }
@@ -604,9 +575,8 @@ public final class GpsSampleOuterClass {
         if (other.getTime() != 0L) {
           setTime(other.getTime());
         }
-        if (!other.getActionId().isEmpty()) {
-          actionId_ = other.actionId_;
-          onChanged();
+        if (other.getTaskId() != 0L) {
+          setTaskId(other.getTaskId());
         }
         onChanged();
         return this;
@@ -790,71 +760,28 @@ public final class GpsSampleOuterClass {
         return this;
       }
 
-      private Object actionId_ = "";
+      private long taskId_ ;
       /**
-       * <code>optional string actionId = 7;</code>
+       * <code>optional int64 taskId = 7;</code>
        */
-      public String getActionId() {
-        Object ref = actionId_;
-        if (!(ref instanceof String)) {
-          com.google.protobuf.ByteString bs =
-              (com.google.protobuf.ByteString) ref;
-          String s = bs.toStringUtf8();
-          actionId_ = s;
-          return s;
-        } else {
-          return (String) ref;
-        }
+      public long getTaskId() {
+        return taskId_;
       }
       /**
-       * <code>optional string actionId = 7;</code>
+       * <code>optional int64 taskId = 7;</code>
        */
-      public com.google.protobuf.ByteString
-          getActionIdBytes() {
-        Object ref = actionId_;
-        if (ref instanceof String) {
-          com.google.protobuf.ByteString b = 
-              com.google.protobuf.ByteString.copyFromUtf8(
-                  (String) ref);
-          actionId_ = b;
-          return b;
-        } else {
-          return (com.google.protobuf.ByteString) ref;
-        }
-      }
-      /**
-       * <code>optional string actionId = 7;</code>
-       */
-      public Builder setActionId(
-          String value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  
-        actionId_ = value;
+      public Builder setTaskId(long value) {
+        
+        taskId_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>optional string actionId = 7;</code>
+       * <code>optional int64 taskId = 7;</code>
        */
-      public Builder clearActionId() {
+      public Builder clearTaskId() {
         
-        actionId_ = getDefaultInstance().getActionId();
-        onChanged();
-        return this;
-      }
-      /**
-       * <code>optional string actionId = 7;</code>
-       */
-      public Builder setActionIdBytes(
-          com.google.protobuf.ByteString value) {
-        if (value == null) {
-    throw new NullPointerException();
-  }
-  checkByteStringIsUtf8(value);
-        
-        actionId_ = value;
+        taskId_ = 0L;
         onChanged();
         return this;
       }
@@ -921,10 +848,10 @@ public final class GpsSampleOuterClass {
       descriptor;
   static {
     String[] descriptorData = {
-      "\n\017GpsSample.proto\"p\n\tGpsSample\022\013\n\003lng\030\001 " +
+      "\n\017GpsSample.proto\"n\n\tGpsSample\022\013\n\003lng\030\001 " +
       "\001(\001\022\013\n\003lat\030\002 \001(\001\022\014\n\004vlng\030\003 \001(\001\022\014\n\004vlat\030\004" +
-      " \001(\001\022\r\n\005carId\030\005 \001(\003\022\014\n\004time\030\006 \001(\003\022\020\n\010act" +
-      "ionId\030\007 \001(\tb\006proto3"
+      " \001(\001\022\r\n\005carId\030\005 \001(\003\022\014\n\004time\030\006 \001(\003\022\016\n\006tas" +
+      "kId\030\007 \001(\003b\006proto3"
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
@@ -943,7 +870,7 @@ public final class GpsSampleOuterClass {
     internal_static_GpsSample_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_GpsSample_descriptor,
-        new String[] { "Lng", "Lat", "Vlng", "Vlat", "CarId", "Time", "ActionId", });
+        new String[] { "Lng", "Lat", "Vlng", "Vlat", "CarId", "Time", "TaskId", });
   }
 
   // @@protoc_insertion_point(outer_class_scope)

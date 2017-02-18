@@ -8,7 +8,7 @@ import java.util.Date;
 public class GpsSamplePo {
     private Long traceId;
     private Long carId;
-    private String actionId;
+    private Long taskId;
     private Double vLat;
     private Double vLong;
     private Double latitude;
@@ -20,7 +20,7 @@ public class GpsSamplePo {
 
     public GpsSamplePo(GpsSampleOuterClass.GpsSample sample) {
         this.carId = sample.getCarId();
-        this.actionId = sample.getActionId();
+        this.taskId = sample.getTaskId();
         this.vLat = sample.getVlat();
         this.vLong = sample.getVlng();
         this.latitude = sample.getLat();
@@ -44,12 +44,12 @@ public class GpsSamplePo {
         this.carId = carId;
     }
 
-    public String getActionId() {
-        return actionId;
+    public Long getTaskId() {
+        return taskId;
     }
 
-    public void setActionId(String actionId) {
-        this.actionId = actionId;
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
     }
 
     public Double getvLat() {
@@ -95,7 +95,7 @@ public class GpsSamplePo {
     public GpsSampleOuterClass.GpsSample toGpsSample() {
         GpsSampleOuterClass.GpsSample.Builder builder = GpsSampleOuterClass.GpsSample.newBuilder();
         builder.setCarId(carId);
-        builder.setActionId(actionId);
+        builder.setTaskId(taskId);
         builder.setLat(latitude);
         builder.setLng(longitude);
         builder.setVlat(vLat);
