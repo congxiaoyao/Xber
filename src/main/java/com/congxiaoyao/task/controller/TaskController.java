@@ -1,5 +1,6 @@
 package com.congxiaoyao.task.controller;
 
+import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.spot.service.def.SpotService;
 import com.congxiaoyao.task.pojo.*;
 import com.congxiaoyao.task.service.def.TaskService;
@@ -67,5 +68,15 @@ public class TaskController {
             timestamp = new Date();
         }
         return new TaskListRsp(timestamp, taskRsps);
+    }
+
+    /**
+     * 根据任务id获取车辆历史轨迹
+     * @param taskId
+     * @return
+     */
+    @RequestMapping(value = "/task/trace", method = RequestMethod.GET)
+    public List<GpsSamplePo> getCarTrace(Long taskId) {
+        return taskService.getTrace(taskId);
     }
 }

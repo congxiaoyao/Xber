@@ -10,7 +10,8 @@ import org.apache.shiro.authc.UnknownAccountException;
 public interface UserService {
     /**
      * 通过id获取用户基本信息（用户名密码等）
-     * @param userId    用户id
+     *
+     * @param userId 用户id
      * @return
      * @throws UnknownAccountException
      */
@@ -18,7 +19,8 @@ public interface UserService {
 
     /**
      * 通过用户名获取用户基本信息（用户名密码等）
-     * @param username  用户名
+     *
+     * @param username 用户名
      * @return
      * @throws UnknownAccountException
      */
@@ -26,9 +28,18 @@ public interface UserService {
 
     /**
      * 获取用户详细信息
+     *
      * @param userId
      * @return
      * @throws Exception
      */
     User getUserDetail(Long userId) throws Exception;
+
+    /**
+     * 注册用户
+     *
+     * @param user
+     * @param userType 用户类型 0：管理员，1：司机
+     */
+    void registerUser(User user, Integer userType);
 }

@@ -6,4 +6,5 @@ package com.congxiaoyao.common;
 public class URIConfig {
     public static final String SYSTEM = "/topic/system";
     public static final String USER_SYSTEM = "/system";
+    public static final String TASK_STATUS_CHANGE = "/task";
 }

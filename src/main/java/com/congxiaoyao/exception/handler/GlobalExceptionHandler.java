@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.sql.SQLException;
+
 /**
  * 全局异常处理器
  * Created by Jaycejia on 2016/12/3.
@@ -22,6 +24,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
     private Logger logger = LoggerFactory.getLogger(this.getClass());
+
     /**
      * 处理未授权的回应
      * HTTP状态码  401 UNAUTHORIZED
@@ -112,7 +115,7 @@ public class GlobalExceptionHandler {
      * @return
      */
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(MyBatisSystemException.class)
+    @ExceptionHandler({MyBatisSystemException.class, SQLException.class})
     public ErrorInfo resolveMybatisException(MyBatisSystemException e) {
         String errorMessage = "数据库操作错误";
         if (logger.isErrorEnabled()) {

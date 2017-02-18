@@ -11,7 +11,7 @@ import java.util.List;
  */
 public interface TaskDetailMapper {
     List<Task> selectByCondition(@Param("userId") Long userId,
-                                 @Param("pageIndex") Integer pageIndex,
+                                 @Param("startIndex") Integer startIndex,
                                  @Param("pageSize") Integer pageSize,
                                  @Param("status") Integer status,
                                  @Param("timestamp") Date timestamp);

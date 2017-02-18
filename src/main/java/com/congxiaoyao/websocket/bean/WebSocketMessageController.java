@@ -51,7 +51,7 @@ public class WebSocketMessageController {
     public void echoToUser(String userId) {
         logger.info("echo invoked, userId = " + userId);
         simpMessagingTemplate.convertAndSendToUser(userId,
-                "/echo", "hello, " + userId);
+                "/sysInfo", "hello, " + userId);
     }
 
     /**
@@ -86,7 +86,6 @@ public class WebSocketMessageController {
             String payload = wrapSamples(samples, queryMessage.getQueryId());
             simpMessagingTemplate.convertAndSendToUser(queryMessage.getUserId().toString(),
                     "/nearestNCars", payload);
-            simpMessagingTemplate.convertAndSend("/topic/nearestNCars", payload);
             if (logger.isInfoEnabled()) {
                 logger.info("Response for user:" + queryMessage.getUserId()
                         + " for query:" + queryMessage.getQueryId()

@@ -1,11 +1,11 @@
 package com.congxiaoyao.car.controller;
 
+import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
+import com.congxiaoyao.car.pojo.CarDriverReq;
 import com.congxiaoyao.car.service.def.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -30,15 +30,69 @@ public class CarController {
     }
 
     /**
-     * 获取车辆列表
+     * 获取没有分配司机的车辆
+     * @return
+     */
+    @RequestMapping(value = "/car/unused", method = RequestMethod.GET)
+    public List<Car> getCarsWithoutDriver() {
+        return carService.getCarsWithoutDriver();
+    }
+
+    /**
+     * 获取闲置车辆列表
      *
      * @param startTime
      * @param endTime
-     * @param status
      * @return
      */
-    public List<CarDetail> getCars(Date startTime, Date endTime, Integer status) {
-        return carService.getCars(startTime, endTime, status);
+    @RequestMapping(value = "/car/free", method = RequestMethod.GET)
+    public List<CarDetail> getFreeCars(Date startTime, Date endTime) {
+        return carService.getFreeCars(startTime, endTime);
+    }
+
+    /**
+     * 根据目的地始发地获取目前正在执行任务的车辆，若传空为不指定
+     *
+     * @param startSpot
+     * @param endSpot
+     * @return
+     */
+    @RequestMapping(value = "/car/onTask", method = RequestMethod.GET)
+    public List<CarDetail> getCarsOnTask(Long startSpot, Long endSpot) {
+        return carService.getCarsOnTask(startSpot, endSpot);
+    }
+
+    /**
+     * 根据车牌获取车辆信息(模糊匹配）
+     *
+     * @param plate
+     * @return
+     */
+    @RequestMapping(value = "/car/{plate}/plate", method = RequestMethod.GET)
+    public List<CarDetail> getCarsByPlate(@PathVariable("plate") String plate) {
+        return carService.getCarsByPlate(plate);
+    }
+
+    /**
+     * 根据用户姓名获取车辆信息
+     *
+     * @param name
+     * @return
+     */
+    @RequestMapping(value = "/car/{name}/name",method = RequestMethod.GET)
+    public List<CarDetail> getCarsByName(@PathVariable String name) {
+        return carService.getCarsByUserName(name);
+    }
+
+    /**
+     * 为车辆分配司机
+     * @param req
+     * @return
+     */
+    @RequestMapping(value = "/car/driver", method = RequestMethod.PUT)
+    public String changeCarDriver(@RequestBody CarDriverReq req) {
+        carService.changeCarDriver(req.getCarId(), req.getUserId());
+        return "操作成功";
     }
 }
 

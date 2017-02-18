@@ -1,5 +1,6 @@
 package com.congxiaoyao.task.service.def;
 
+import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.task.pojo.LaunchTaskRequest;
 import com.congxiaoyao.task.pojo.Task;
 
@@ -32,4 +33,11 @@ public interface TaskService {
      * @param taskRequest
      */
     void generateTask(Long userId, LaunchTaskRequest taskRequest);
+
+    /**
+     * 根据任务id获取车辆轨迹
+     * @param taskId
+     * @return
+     */
+    List<GpsSamplePo> getTrace(Long taskId);
 }

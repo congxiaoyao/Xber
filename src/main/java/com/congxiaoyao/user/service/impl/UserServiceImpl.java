@@ -53,4 +53,15 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
+
+    /**
+     * 注册用户
+     *
+     * @param user
+     * @param userType 用户类型 0：管理员，1：司机
+     */
+    @Override
+    public void registerUser(User user, Integer userType) {
+        userMapper.insert(user);
+    }
 }
