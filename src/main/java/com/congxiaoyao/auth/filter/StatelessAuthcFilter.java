@@ -39,7 +39,9 @@ public class StatelessAuthcFilter extends AccessControlFilter {
         //1、根据客户端认证信息生成无状态Token
         String requestMessage = httpServletRequest.getHeader(HttpHeaders.AUTHORIZATION);
         try {
-            checkToken(requestMessage);
+            StatelessToken token = checkToken(requestMessage);
+            StatelessSession session = sessionService.getSessionByClientId((String) token.getPrincipal());
+            request.setAttribute("userId", session.getUserId());
         } catch (Exception e) {
             onAuthcFail(request, e);
         } finally {
@@ -54,7 +56,7 @@ public class StatelessAuthcFilter extends AccessControlFilter {
         request.setAttribute("shiroLoginFailure", exp);
     }
 
-    public static void checkToken(String requestMessage) {
+    public static StatelessToken checkToken(String requestMessage) {
         StatelessToken token = new StatelessToken();
         if (requestMessage == null || "".equals(requestMessage)) {
             throw new NoAuthenticatedInfoException();//无认证，登录失败
@@ -69,6 +71,7 @@ public class StatelessAuthcFilter extends AccessControlFilter {
             Subject subject = SecurityUtils.getSubject();
             subject.login(token);
         }
+        return token;
     }
 
 }

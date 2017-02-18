@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.congxiaoyao.task.dao.TaskDetailMapper">
+    <resultMap id="BaseResultMap" type="com.congxiaoyao.task.pojo.Task">
+        <id column="task_id" jdbcType="BIGINT" property="taskId"/>
+        <result column="car_id" jdbcType="BIGINT" property="carId"/>
+        <result column="start_time" jdbcType="TIMESTAMP" property="startTime"/>
+        <result column="start_spot" jdbcType="BIGINT" property="startSpot"/>
+        <result column="end_time" jdbcType="TIMESTAMP" property="endTime"/>
+        <result column="end_spot" jdbcType="BIGINT" property="endSpot"/>
+        <result column="content" jdbcType="VARCHAR" property="content"/>
+        <result column="create_user" jdbcType="BIGINT" property="createUser"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="real_start_time" jdbcType="TIMESTAMP" property="realStartTime"/>
+        <result column="real_end_time" jdbcType="TIMESTAMP" property="realEndTime"/>
+        <result column="status" jdbcType="INTEGER" property="status"/>
+        <result column="note" jdbcType="VARCHAR" property="note"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        task_id, c.car_id, start_time, start_spot, end_time, end_spot, content, create_user,
+        create_time, real_start_time, real_end_time, status, note
+    </sql>
+    <select id="selectByCondition" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tab_car c JOIN tab_task t ON c.car_id = t.car_id
+        WHERE user_id = #{userId}
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="timestamp != null">
+            <![CDATA[
+             AND t.create_time <= #{timestamp}
+            ]]></if>
+        ORDER BY create_time
+        LIMIT ${pageIndex}, ${pageSize}
+    </select>
+</mapper>
