@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.congxiaoyao.car.dao.CarUserMapper">
+    <resultMap id="BaseResultMap" type="com.congxiaoyao.user.pojo.BasicUserInfo">
+        <id column="user_id" property="userId"/>
+        <result column="name" property="name"/>
+        <result column="gender" property="gender"/>
+        <result column="avatar" property="avatar"/>
+        <result column="age" property="age"/>
+    </resultMap>
+
+    <resultMap id="CarDetailMap" type="com.congxiaoyao.car.pojo.CarDetail">
+        <id column="car_id" property="carId"/>
+        <result column="plate_no" property="plate"/>
+        <result column="spec" property="spec"/>
+        <association property="userInfo" resultMap="BaseResultMap"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        user_id, name, gender, avatar, age
+    </sql>
+    <select id="selectUserByCarId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM tab_user u JOIN tab_car c ON u.user_id = c.user_id
+        WHERE car_id = #{carId}
+    </select>
+
+    <select id="selectCarInfobyCarId" resultMap="CarDetailMap">
+        SELECT
+            car_id,
+            plate_no,
+            spec,
+            c.user_id,
+            name,
+            gender,
+            avatar,
+            age
+        FROM tab_user u
+            JOIN tab_car c ON u.user_id = c.user_id
+        WHERE car_id = #{carId};
+    </select>
+</mapper>

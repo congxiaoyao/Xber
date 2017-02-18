@@ -1,6 +1,6 @@
 package com.congxiaoyao.websocket.bean;
 
-import com.congxiaoyao.location.manager.IGpsSampleCache;
+import com.congxiaoyao.location.cache.IGpsSampleCache;
 import com.congxiaoyao.location.pojo.CarsQueryMessage;
 import com.congxiaoyao.utils.GPSEncoderUtils;
 import org.slf4j.Logger;

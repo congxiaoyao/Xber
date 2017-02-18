@@ -1,4 +1,4 @@
-package com.congxiaoyao.location.manager;
+package com.congxiaoyao.location.cache;
 
 import com.infomatiq.jsi.Point;
 import com.infomatiq.jsi.Rectangle;

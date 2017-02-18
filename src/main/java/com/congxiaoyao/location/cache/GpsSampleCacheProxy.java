@@ -1,4 +1,4 @@
-package com.congxiaoyao.location.manager;
+package com.congxiaoyao.location.cache;
 
 import com.congxiaoyao.location.pojo.GpsSampleOuterClass;
 import com.congxiaoyao.location.service.def.LocationService;
