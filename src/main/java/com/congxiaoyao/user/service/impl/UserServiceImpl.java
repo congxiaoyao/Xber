@@ -1,11 +1,13 @@
 package com.congxiaoyao.user.service.impl;
 
+import com.congxiaoyao.auth.pojo.EncryptedPassword;
 import com.congxiaoyao.user.dao.SimpleUserMapper;
 import com.congxiaoyao.user.dao.UserMapper;
 import com.congxiaoyao.user.pojo.SimpleUser;
 import com.congxiaoyao.user.pojo.SimpleUserExample;
 import com.congxiaoyao.user.pojo.User;
 import com.congxiaoyao.user.service.def.UserService;
+import com.congxiaoyao.util.PasswordUtils;
 import org.apache.shiro.authc.UnknownAccountException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -58,10 +60,12 @@ public class UserServiceImpl implements UserService {
      * 注册用户
      *
      * @param user
-     * @param userType 用户类型 0：管理员，1：司机
      */
     @Override
-    public void registerUser(User user, Integer userType) {
+    public void registerUser(User user) {
+        EncryptedPassword encryptedPassword = PasswordUtils.encrypt(user.getPassword());
+        user.setPassword(encryptedPassword.getPassword());
+        user.setSalt(encryptedPassword.getSalt());
         userMapper.insert(user);
     }
 }

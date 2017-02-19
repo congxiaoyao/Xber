@@ -39,7 +39,6 @@ public interface UserService {
      * 注册用户
      *
      * @param user
-     * @param userType 用户类型 0：管理员，1：司机
      */
-    void registerUser(User user, Integer userType);
+    void registerUser(User user);
 }

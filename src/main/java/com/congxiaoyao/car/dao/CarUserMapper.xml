@@ -71,7 +71,7 @@
                               AND end_time
                               AND #{endTime} NOT BETWEEN start_time
                               AND end_time
-                              AND `status` = #{status}
+                              AND `status` = 2
                       ) t ON c.car_id = t.car_id
     </select>
     <select id="selectCarsOnMission" resultMap="CarDetailMap">
