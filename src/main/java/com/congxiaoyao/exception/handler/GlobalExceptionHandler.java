@@ -1,6 +1,8 @@
 package com.congxiaoyao.exception.handler;
 
 import com.congxiaoyao.auth.exception.InvalidTokenException;
+import com.congxiaoyao.auth.exception.NoAuthenticatedInfoException;
+import com.congxiaoyao.auth.exception.NotAuthenticatedException;
 import com.congxiaoyao.common.pojo.ErrorInfo;
 import org.apache.shiro.authc.ExpiredCredentialsException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -75,6 +77,32 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ExpiredCredentialsException.class)
     public ErrorInfo resolveTokenExpired(ExpiredCredentialsException e) {
         return new ErrorInfo(ErrorInfo.AUTHENTICATION_ERROR, "认证超时，请重新登录", e);
+    }
+
+    /**
+     * 处理未认证的回应
+     * HTTP状态吗 403 FORBIDDEN
+     *
+     * @param e
+     * @return
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(NotAuthenticatedException.class)
+    public ErrorInfo resolveNotAuthenticated(NotAuthenticatedException e) {
+        return new ErrorInfo(ErrorInfo.AUTHENTICATION_ERROR, "用户终端非法或未进行认证，请登录", e);
+    }
+
+    /**
+     * 处理未认证的回应
+     * HTTP状态吗 403 FORBIDDEN
+     *
+     * @param e
+     * @return
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(NoAuthenticatedInfoException.class)
+    public ErrorInfo resolveNoAuthenticatedInfo(NoAuthenticatedInfoException e) {
+        return new ErrorInfo(ErrorInfo.AUTHENTICATION_ERROR, "未认证，请登录", e);
     }
 
     /**

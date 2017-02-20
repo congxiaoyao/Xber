@@ -2,7 +2,7 @@ package com.congxiaoyao.websocket.bean;
 
 import com.congxiaoyao.location.cache.IGpsSampleCache;
 import com.congxiaoyao.location.pojo.CarsQueryMessage;
-import com.congxiaoyao.utils.GPSEncoderUtils;
+import com.congxiaoyao.util.GPSEncoderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

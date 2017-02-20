@@ -1,4 +1,4 @@
-package com.congxiaoyao.utils;
+package com.congxiaoyao.util;
 
 /**
  * Created by Jaycejia on 2017/2/11.

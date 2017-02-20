@@ -15,7 +15,7 @@
         SELECT *
         FROM tab_position_trace
     </select>
-    <select id="getTrace" resultMap="gpsSampleMap" parameterType="java.lang.String">
+    <select id="getTrace" resultMap="gpsSampleMap" parameterType="java.lang.Long">
         SELECT
             trace_id,
             car_id,
