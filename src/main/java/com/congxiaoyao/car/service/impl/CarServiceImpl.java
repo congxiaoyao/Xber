@@ -3,6 +3,7 @@ package com.congxiaoyao.car.service.impl;
 import com.congxiaoyao.car.dao.CarUserMapper;
 import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
+import com.congxiaoyao.car.pojo.NewCar;
 import com.congxiaoyao.car.service.def.CarService;
 import com.congxiaoyao.location.dao.LocationMapper;
 import com.congxiaoyao.user.pojo.BasicUserInfo;
@@ -21,6 +22,16 @@ import java.util.List;
 public class CarServiceImpl implements CarService {
     @Autowired
     private CarUserMapper carUserMapper;
+
+    /**
+     * 添加一辆新的车辆
+     *
+     * @param car
+     */
+    @Override
+    public void addCar(NewCar car) {
+        carUserMapper.insertCar(car);
+    }
 
     /**
      * 获取所有未绑司机车辆

@@ -2,6 +2,7 @@ package com.congxiaoyao.car.service.def;
 
 import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
+import com.congxiaoyao.car.pojo.NewCar;
 import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.user.pojo.BasicUserInfo;
 
@@ -12,6 +13,13 @@ import java.util.List;
  * Created by Jaycejia on 2017/2/18.
  */
 public interface CarService {
+    /**
+     * 添加一辆新的车辆
+     *
+     * @param car
+     */
+    void addCar(NewCar car);
+
     /**
      * 获取所有未绑司机车辆
      *
@@ -71,6 +79,7 @@ public interface CarService {
 
     /**
      * 设置车辆司机
+     *
      * @param carId
      * @param userId
      */
