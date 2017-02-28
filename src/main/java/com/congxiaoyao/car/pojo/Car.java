@@ -1,7 +1,5 @@
 package com.congxiaoyao.car.pojo;
 
-import com.congxiaoyao.user.pojo.BasicUserInfo;
-
 /**
  * Created by Jaycejia on 2017/2/18.
  */

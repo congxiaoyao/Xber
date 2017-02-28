@@ -2,6 +2,7 @@ package com.congxiaoyao.car.dao;
 
 import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
+import com.congxiaoyao.car.pojo.NewCar;
 import com.congxiaoyao.user.pojo.BasicUserInfo;
 import org.apache.ibatis.annotations.Param;
 
@@ -30,4 +31,6 @@ public interface CarUserMapper {
     List<CarDetail> selectCarsByUserName(String name);
 
     void updateCarUser(@Param("carId") Long carId, @Param("userId") Long userId);
+
+    void insertCar(NewCar car);
 }

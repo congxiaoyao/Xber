@@ -3,6 +3,7 @@ package com.congxiaoyao.car.controller;
 import com.congxiaoyao.car.pojo.Car;
 import com.congxiaoyao.car.pojo.CarDetail;
 import com.congxiaoyao.car.pojo.CarDriverReq;
+import com.congxiaoyao.car.pojo.NewCar;
 import com.congxiaoyao.car.service.def.CarService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,10 @@ public class CarController {
     @Autowired
     private CarService carService;
 
+    @RequestMapping(value = "/car", method = RequestMethod.POST)
+    public void addCar(@RequestBody NewCar car) {
+        carService.addCar(car);
+    }
     /**
      * 根据car id获取车辆信息
      *

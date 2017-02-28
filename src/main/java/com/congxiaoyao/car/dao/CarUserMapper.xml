@@ -25,7 +25,10 @@
         u.user_id, name, gender, avatar, age
     </sql>
     <select id="selectCarsWithoutDriver" resultMap="CarMap">
-        SELECT car_id,plate_no,spec
+        SELECT
+            car_id,
+            plate_no,
+            spec
         FROM tab_car
         WHERE user_id IS NULL
     </select>
@@ -50,7 +53,7 @@
         WHERE car_id = #{carId};
     </select>
     <select id="selectFreeCars" resultMap="CarDetailMap">
-        SELECT DISTINCT
+        SELECT
             c.car_id,
             plate_no,
             spec,
@@ -61,18 +64,17 @@
             age
         FROM
             tab_user u
-            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
-            LEFT JOIN (
-                          SELECT *
-                          FROM
-                              tab_task
-                          WHERE
-                              #{startTime} NOT BETWEEN start_time
-                              AND end_time
-                              AND #{endTime} NOT BETWEEN start_time
-                              AND end_time
-                              AND `status` = 2
-                      ) t ON c.car_id = t.car_id
+            JOIN tab_car c ON u.user_id = c.user_id
+                              AND user_type = 1
+                              AND car_id NOT IN (
+            SELECT car_id
+            FROM
+                tab_task
+            WHERE
+                start_time NOT BETWEEN #{startTime} AND #{endTime}
+                AND end_time NOT BETWEEN #{startTime} AND #{endTime}
+                AND `status` NOT IN (0, 1)
+        )
     </select>
     <select id="selectCarsOnMission" resultMap="CarDetailMap">
         SELECT
@@ -86,8 +88,8 @@
         age
         FROM tab_user u
         JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
-        LEFT JOIN (
-        SELECT *
+        AND car_id IN (
+        SELECT tab_task.car_id
         FROM
         tab_task
         WHERE
@@ -99,7 +101,7 @@
         <if test="endSpot != null">
             AND tab_task.end_spot = #{endSpot}
         </if>
-        ) t ON c.car_id = t.car_id
+        )
     </select>
     <select id="selectCarsByPlate" resultMap="CarDetailMap">
         SELECT
@@ -134,4 +136,10 @@
         SET user_id = #{userId}
         WHERE car_id = #{carId}
     </update>
+    <insert id="insertCar" parameterType="com.congxiaoyao.car.pojo.NewCar">
+        INSERT INTO
+            tab_car(plate_no, spec)
+        VALUES
+            (#{plate}, #{spec})
+    </insert>
 </mapper>
