@@ -41,6 +41,11 @@ public class GpsSampleCacheProxy implements IGpsSampleCache {
     }
 
     @Override
+    public void clearExpired(long refTime) {
+        gpsSampleCache.clearExpired(refTime);
+    }
+
+    @Override
     public List<GpsSampleOuterClass.GpsSample[]> nearestN(double lng, double lat, int n, double d) {
         return gpsSampleCache.nearestN(lng, lat, n, d);
     }
@@ -56,6 +61,11 @@ public class GpsSampleCacheProxy implements IGpsSampleCache {
     @Override
     public void clearExpired() {
         gpsSampleCache.clearExpired();
+    }
+
+    @Override
+    public List<GpsSampleOuterClass.GpsSample[]> getTraceByCarIds(List<Long> carIds) {
+        return gpsSampleCache.getTraceByCarIds(carIds);
     }
 
     @Scheduled(fixedRate = 10000L)

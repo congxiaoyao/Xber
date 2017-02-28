@@ -71,8 +71,11 @@ public class RTree implements SpatialIndex {
     // stacks used to store nodeId and entry index of each node
     // from the root down to the leaf. Enables fast lookup
     // of nodes when a split is propagated up the tree.
-    private TIntStack parents = new TIntStack();
-    private TIntStack parentsEntry = new TIntStack();
+//    private TIntStack parents = new TIntStack();
+//    private TIntStack parentsEntry = new TIntStack();
+
+    private static ThreadLocal<TIntStack> localParents = new ThreadLocal<>();
+    private static ThreadLocal<TIntStack> localParentsEntry = new ThreadLocal<>();
 
     // initialisation
     private int treeHeight = 1; // leaves are always level 1
@@ -97,8 +100,9 @@ public class RTree implements SpatialIndex {
     private SortedList nearestNIds = new SortedList();
 
     // List of nearestN rectanges, used in the alternative nearestN implementation.
-    private PriorityQueue distanceQueue =
-            new PriorityQueue(PriorityQueue.SORT_ORDER_ASCENDING);
+//    private SortedQueue distanceQueue =
+//            new SortedQueue(SortedQueue.SORT_ORDER_ASCENDING);
+    private static ThreadLocal<PriorityQueue> localDistanceQueue = new ThreadLocal<>();
 
     /**
      * Constructor. Use init() method to initialize parameters of the RTree.
@@ -231,9 +235,12 @@ public class RTree implements SpatialIndex {
         // to determine if it contains r. For each entry found, invoke
         // findLeaf on the node pointed to by the entry, until r is found or
         // all entries have been checked.
+
+        TIntStack parents = getParents();
         parents.reset();
         parents.push(rootNodeId);
 
+        TIntStack parentsEntry = getParentsEntry();
         parentsEntry.reset();
         parentsEntry.push(-1);
         Node n = null;
@@ -315,18 +322,21 @@ public class RTree implements SpatialIndex {
         nearestIds.reset();
     }
 
-    private void createNearestNDistanceQueue(Point p, int count, float furthestDistance) {
+    private PriorityQueue createNearestNDistanceQueue(Point p, int count, float furthestDistance) {
+        PriorityQueue distanceQueue = getDistanceQueue();
         distanceQueue.reset();
         distanceQueue.setSortOrder(PriorityQueue.SORT_ORDER_DESCENDING);
 
         //  return immediately if given an invalid "down" parameter
         if (count <= 0) {
-            return;
+            return distanceQueue;
         }
 
+        TIntStack parents = getParents();
         parents.reset();
         parents.push(rootNodeId);
 
+        TIntStack parentsEntry = getParentsEntry();
         parentsEntry.reset();
         parentsEntry.push(-1);
 
@@ -405,6 +415,34 @@ public class RTree implements SpatialIndex {
             parents.pop();
             parentsEntry.pop();
         }
+        return distanceQueue;
+    }
+
+    private PriorityQueue getDistanceQueue() {
+        PriorityQueue distanceQueue = localDistanceQueue.get();
+        if (distanceQueue == null) {
+            distanceQueue = new PriorityQueue(PriorityQueue.SORT_ORDER_ASCENDING);
+            localDistanceQueue.set(distanceQueue);
+        }
+        return distanceQueue;
+    }
+
+    private TIntStack getParents() {
+        TIntStack parents = localParents.get();
+        if (parents == null) {
+            parents = new TIntStack();
+            localParents.set(parents);
+        }
+        return parents;
+    }
+
+    private TIntStack getParentsEntry() {
+        TIntStack parentsEntry = localParentsEntry.get();
+        if (parentsEntry == null) {
+            parentsEntry = new TIntStack();
+            localParentsEntry.set(parentsEntry);
+        }
+        return parentsEntry;
     }
 
     /**
@@ -422,7 +460,7 @@ public class RTree implements SpatialIndex {
         // return exactly the same items as the the original version (nearestN_orig), in particular,
         // more than N items will be returned if items N and N+x have the
         // same priority.
-        createNearestNDistanceQueue(p, count, furthestDistance);
+        PriorityQueue distanceQueue = createNearestNDistanceQueue(p, count, furthestDistance);
 
         while (distanceQueue.size() > 0) {
             v.execute(distanceQueue.getValue());
@@ -434,7 +472,7 @@ public class RTree implements SpatialIndex {
      * @see com.infomatiq.jsi.SpatialIndex#nearestN(Point, TIntProcedure, int, float)
      */
     public void nearestN(Point p, TIntProcedure v, int count, float furthestDistance) {
-        createNearestNDistanceQueue(p, count, furthestDistance);
+        PriorityQueue distanceQueue = createNearestNDistanceQueue(p, count, furthestDistance);
 
         distanceQueue.setSortOrder(PriorityQueue.SORT_ORDER_ASCENDING);
 
@@ -456,9 +494,11 @@ public class RTree implements SpatialIndex {
             return;
         }
 
+        TIntStack parents = getParents();
         parents.reset();
         parents.push(rootNodeId);
 
+        TIntStack parentsEntry = getParentsEntry();
         parentsEntry.reset();
         parentsEntry.push(-1);
 
@@ -535,9 +575,11 @@ public class RTree implements SpatialIndex {
         // find all rectangles in the tree that are contained by the passed rectangle
         // written to be non-recursive (should model other searches on this?)
 
+        TIntStack parents = getParents();
         parents.reset();
         parents.push(rootNodeId);
 
+        TIntStack parentsEntry = getParentsEntry();
         parentsEntry.reset();
         parentsEntry.push(-1);
 
@@ -740,10 +782,10 @@ public class RTree implements SpatialIndex {
 
         // debug code
 //    if (log.isDebugEnabled()) {
-//      float newArea = Rectangle.area(n.mbrMinX, n.mbrMinY, n.mbrMaxX, n.mbrMaxY) + 
+//      float newArea = Rectangle.area(n.mbrMinX, n.mbrMinY, n.mbrMaxX, n.mbrMaxY) +
 //                      Rectangle.area(newNode.mbrMinX, newNode.mbrMinY, newNode.mbrMaxX, newNode.mbrMaxY);
 //      float percentageIncrease = (100 * (newArea - initialArea)) / initialArea;
-//      log.debug("Node " + n.nodeId + " split. New area increased by " + percentageIncrease + "%");   
+//      log.debug("Node " + n.nodeId + " split. New area increased by " + percentageIncrease + "%");
 //    }
 
         return newNode;
@@ -804,7 +846,7 @@ public class RTree implements SpatialIndex {
             }
 
 //      if (log.isDebugEnabled()) {
-//              log.debug("Entry " + i + ", dimension X: HighestLow = " + tempHighestLow + 
+//              log.debug("Entry " + i + ", dimension X: HighestLow = " + tempHighestLow +
 //                        " (index " + tempHighestLowIndex + ")" + ", LowestHigh = " +
 //                        tempLowestHigh + " (index " + tempLowestHighIndex + ", NormalizedSeparation = " + normalizedSeparation);
 //      }
@@ -849,7 +891,7 @@ public class RTree implements SpatialIndex {
             }
 
 //      if (log.isDebugEnabled()) {
-//        log.debug("Entry " + i + ", dimension Y: HighestLow = " + tempHighestLow + 
+//        log.debug("Entry " + i + ", dimension Y: HighestLow = " + tempHighestLow +
 //                  " (index " + tempHighestLowIndex + ")" + ", LowestHigh = " +
 //                  tempLowestHigh + " (index " + tempLowestHighIndex + ", NormalizedSeparation = " + normalizedSeparation);
 //      }
@@ -1067,6 +1109,8 @@ public class RTree implements SpatialIndex {
 
         // CT2 [Find parent entry] If N is the root, go to CT6. Otherwise
         // let P be the parent of N, and let En be N's entry in P
+        TIntStack parents = getParents();
+        TIntStack parentsEntry = getParentsEntry();
         while (n.level != treeHeight) {
             parent = getNode(parents.pop());
             parentEntry = parentsEntry.pop();
@@ -1120,6 +1164,8 @@ public class RTree implements SpatialIndex {
     private Node chooseNode(float minX, float minY, float maxX, float maxY, int level) {
         // CL1 [Initialize] Set N to be the root node
         Node n = getNode(rootNodeId);
+        TIntStack parents = getParents();
+        TIntStack parentsEntry = getParentsEntry();
         parents.reset();
         parentsEntry.reset();
 
@@ -1173,6 +1219,8 @@ public class RTree implements SpatialIndex {
         // the resulting second node.
 
         // AT2 [Check if done] If N is the root, stop
+        TIntStack parents = getParents();
+        TIntStack parentsEntry = getParentsEntry();
         while (n.level != treeHeight) {
 
             // AT3 [Adjust covering rectangle in parent entry] Let P be the parent

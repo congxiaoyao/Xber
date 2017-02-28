@@ -6,17 +6,21 @@ import com.infomatiq.jsi.rtree.RTree;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import static com.congxiaoyao.location.pojo.GpsSampleOuterClass.GpsSample;
 
 /**
+ * 对于司机端上传的热数据 可以通过GpsSampleCache进行缓存 以便提高查询效率
+ * cache内部使用rtree作为二位数据的索引 提供按范围查找 按车辆查找等功能
+ * 使用规则见方法注释
+ * <p>
  * Created by congxiaoyao on 2017/2/9.
  */
 @Component("gpsSampleCache")
@@ -24,17 +28,17 @@ public class GpsSampleCache implements IGpsSampleCache{
 
     private RTree rTree;
     private ConcurrentMap<Integer, PointSet> latestData;
-    private ReentrantLock lock;
+    private ReadWriteLock readWriteLock;
+    private ReadWriteLock removeLock;
 
     private int expired;        //过期时间 毫秒
 
-    public GpsSampleCache() {
-        init(5000);
+    public GpsSampleCache(int expired) {
+        if (expired <= 0) throw new RuntimeException("过期时间不能小于0");
     }
 
-    public GpsSampleCache(int expired) {
-        if(expired <= 0) throw new RuntimeException("过期时间不能小于0");
-        init(expired);
+    public GpsSampleCache() {
+        init(5000);
     }
 
     private void init(int expired) {
@@ -43,7 +47,9 @@ public class GpsSampleCache implements IGpsSampleCache{
         rTree = new RTree();
         rTree.init(null);
         latestData = new ConcurrentHashMap<>();
-        lock = new ReentrantLock(false);
+
+        readWriteLock = new ReentrantReadWriteLock(false);
+        removeLock = new ReentrantReadWriteLock(false);
     }
 
     /**
@@ -51,67 +57,65 @@ public class GpsSampleCache implements IGpsSampleCache{
      *
      * @param point
      */
-    @Override
     public void put(GpsSample point) {
+        if (point == null) return;
+
         //暂不支持过大的carId
         checkCarIdAndThrow(point.getCarId());
         int carId = (int) point.getCarId();
+
+        //不允许删除和写入同时进行
+        removeLock.readLock().lock();
+
         //创建或获取PointSet
         PointSet pointSet = latestData.get(carId);
         if (pointSet == null) {
-            lock.lock();
+            readWriteLock.writeLock().lock();
             pointSet = latestData.get(carId);
             //双重检查
             if (pointSet == null) {
-                //这里的分支意味着是添加点
-                pointSet = new PointSet();
-                //添加point至PointSet
-                pointSet.addPoint(point);
-                //添加point至rtree
-                Rectangle rectangle = pointSet.getRectangle();
-                rTree.add(rectangle, carId);
-                latestData.put( carId, pointSet);
-                lock.unlock();
+                try {
+                    //这里的分支意味着是添加点
+                    pointSet = new PointSet();
+                    //添加point至PointSet
+                    pointSet.addPoint(point);
+                    //添加point至rtree
+                    Rectangle rectangle = pointSet.getRectangle();
+                    if (rectangle != null) {
+                        rTree.add(rectangle, carId);
+                        latestData.put(carId, pointSet);
+                    }
+                } finally {
+                    readWriteLock.writeLock().unlock();
+                    removeLock.readLock().unlock();
+                }
                 return;
             }
-            lock.unlock();
+            readWriteLock.writeLock().unlock();
         }
+
         //这里意味着之前存在这个车辆上传的数据 需要更新
-        //1.获取添加point之前的rectangle
-        Rectangle oldRect = pointSet.getRectangle();
-        //2.添加point至PointSet
-        pointSet.addPoint(point);
-        //3.获取需要更新的rectangle
-        Rectangle rectangle = pointSet.getRectangle();
-        lock.lock();
-        //4.删除
-        rTree.delete(oldRect, carId);
-        //5.更新
-        rTree.add(rectangle, carId);
-        lock.unlock();
-    }
-
-    @Override
-    public void clearExpired() {
-
-    }
-
-    /**
-     * 清除某个car的缓存轨迹
-     *
-     * @param carId
-     */
-    @Override
-    public void clear(long carId) {
-        checkCarIdAndThrow(carId);
-        int intCarID = (int) carId;
-        PointSet pointSet = latestData.get(intCarID);
-        latestData.remove(intCarID);
-        if (pointSet != null) {
-            lock.lock();
-            rTree.delete(pointSet.getRectangle(), intCarID);
-            lock.unlock();
+        pointSet.writeLock().lock();
+        try {
+            //1.获取添加point之前的rectangle
+            Rectangle oldRect = pointSet.getRectangle();
+            //2.添加point至PointSet
+            pointSet.addPoint(point);
+            //3.获取需要更新的rectangle
+            Rectangle newRect = pointSet.getRectangle();
+            readWriteLock.writeLock().lock();
+            //4.更新
+            try {
+                if (oldRect != null) rTree.delete(oldRect, carId);
+                if (newRect != null) rTree.add(newRect, carId);
+            } finally {
+                readWriteLock.writeLock().unlock();
+            }
+        } finally {
+            pointSet.writeLock().unlock();
         }
+
+        removeLock.readLock().unlock();
     }
 
     /**
@@ -124,27 +128,144 @@ public class GpsSampleCache implements IGpsSampleCache{
      * @param d   在半径为d的范围内
      * @return 关于符合条件的PointSet的List 也就是关于GPSSample[]的List
      */
-    @Override
     public List<GpsSample[]> nearestN(double lng, double lat, int n, double d) {
-        lock.lock();
+        removeLock.readLock().lock();
         List<GpsSample[]> list = new ArrayList<>(n);
-        rTree.nearestNUnsorted(new Point((float) lng, (float) lat), carId -> {
-            PointSet pointSet = latestData.get(carId);
-            if (pointSet != null) {
-                list.add(pointSet.getPath());
+        try {
+            List<PointSet> pointSets = new ArrayList<>(n);
+            readWriteLock.readLock().lock();
+            try {
+                rTree.nearestNUnsorted(new Point((float) lng, (float) lat), carId -> {
+                    PointSet pointSet = latestData.get(carId);
+                    if (pointSet != null) pointSets.add(pointSet);
+                    return true;
+                }, n, (float) d);
+            } finally {
+                readWriteLock.readLock().unlock();
             }
-            return true;
-        }, n, (float) d);
-        lock.unlock();
+            pointSets.stream().forEach(pointSet -> {
+                pointSet.readLock().lock();
+                GpsSample[] path = null;
+                try {
+                    path = pointSet.getPath();
+                } finally {
+                    pointSet.readLock().unlock();
+                    if (path != null) list.add(path);
+                }
+            });
+        } finally {
+            removeLock.readLock().unlock();
+        }
         return list;
     }
 
-    @Override
+    /**
+     * 清除某个car的缓存轨迹
+     *
+     * @param carId
+     */
+    public void clear(long carId) {
+        checkCarIdAndThrow(carId);
+        //stop the world!
+        removeLock.writeLock().lock();
+        try {
+            int intCarID = (int) carId;
+            PointSet pointSet = latestData.get(intCarID);
+            latestData.remove(intCarID);
+            if (pointSet != null) {
+                Rectangle rectangle = pointSet.getRectangle();
+                if (rectangle != null) rTree.delete(rectangle, intCarID);
+            }
+        } finally {
+            removeLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * 给定参考时间 删除比参考时间早expired或更早的点或点集
+     *
+     * @param refTime
+     * @see GpsSampleCache#clearExpired()
+     */
+    public void clearExpired(final long refTime) {
+        //stop the world!
+        removeLock.writeLock().lock();
+        try {
+            latestData.forEach((carId, pointSet) -> {
+                Rectangle oldRect = pointSet.getRectangle();
+                //这是个异常啊朋友 炒鸡古怪
+                if (oldRect == null) {
+                    latestData.remove(carId);
+                    return;
+                }
+                //删除点集中的过期位置
+                boolean hasRemoved = pointSet.removeExpiredPoint(refTime) != 0;
+                if (!hasRemoved) return;
+                //删掉rtree中的所以以及map中的引用
+                if (pointSet.points.size() == 0) {
+                    rTree.delete(oldRect, carId);
+                    latestData.remove(carId);
+                    return;
+                }
+                //删除了这辆车的一部分点 只需要更新rtree
+                Rectangle nowRect = pointSet.getRectangle();
+                rTree.delete(oldRect, carId);
+                rTree.add(nowRect, carId);
+            });
+        } finally {
+            removeLock.writeLock().unlock();
+        }
+    }
+
+    /**
+     * 删除比当前系统时间早expired或更早的点或点集
+     *
+     * @see GpsSampleCache#clearExpired(long)
+     */
+    public void clearExpired() {
+        clearExpired(System.currentTimeMillis());
+    }
+
+    /**
+     * 根据carIds查询对应车辆的轨迹
+     *
+     * @param carIds
+     * @return
+     */
+    public List<GpsSample[]> getTraceByCarIds(List<Long> carIds) {
+        removeLock.readLock().lock();
+        List<GpsSample[]> result = new ArrayList<>(carIds.size());
+        try {
+            carIds.forEach(carId -> {
+                if (carId > Integer.MAX_VALUE) return;
+                PointSet pointSet = latestData.get((int) ((long) carId));
+                if (pointSet == null) return;
+                pointSet.readLock().lock();
+                try {
+                    GpsSample[] path = pointSet.getPath();
+                    if (path != null) result.add(path);
+                } finally {
+                    pointSet.readLock().unlock();
+                }
+            });
+        } finally {
+            removeLock.readLock().unlock();
+        }
+        return result;
+    }
+
+    /**
+     * 设置过期时间
+     *
+     * @param expired
+     */
     public void setExpired(int expired) {
         this.expired = expired;
     }
 
-    @Override
+    /**
+     * @return 过期时间
+     */
     public int getExpired() {
         return expired;
     }
@@ -154,7 +275,6 @@ public class GpsSampleCache implements IGpsSampleCache{
             throw new RuntimeException("carId 过大!!! 真有这么多车吗?!");
         }
     }
-
 
     /**
      * 对于每一辆车 最近{@link GpsSampleCache#expired}时间内的点都会存放在PointSet中
@@ -167,14 +287,14 @@ public class GpsSampleCache implements IGpsSampleCache{
      */
     class PointSet {
 
-        private LinkedList<GpsSample> points;
+        private TreeSet<GpsSample> points;
         private ReadWriteLock lock;
-        private Rectangle rectangle;
+        private Rectangle rectangle = null;
 
         PointSet() {
-            points = new LinkedList<>();
-            lock = new ReentrantReadWriteLock(true);
-            rectangle = new Rectangle();
+            points = new TreeSet<>((sample1, sample2) ->
+                    (int) (sample1.getTime() - sample2.getTime()));
+            lock = new ReentrantReadWriteLock(false);
         }
 
         /**
@@ -183,47 +303,33 @@ public class GpsSampleCache implements IGpsSampleCache{
          * @param point
          */
         public void addPoint(GpsSample point) {
-            lock.writeLock().lock();
-
+            //添加新节点至队列
+            points.add(point);
             //删除过期节点
             while (removeHeadPointIfExpired(point.getTime())) ;
-            //添加新节点至队列
-            addNewPoint(point);
             //更新rectangle
             updateRectangleByPoints();
-            //TODO debug method can remove
-            beforeUnLockWrite(point);
-
-            lock.writeLock().unlock();
         }
 
-        /**
-         * 检查时间序列并将GPSSample对象加入点集
-         *
-         * @param point
-         */
-        private void addNewPoint(GpsSample point) {
-            GpsSample last = null;
-            if (points.size() != 0) last = points.getLast();
-            points.addLast(point);
-            if (last == null) return;
-            if (last.getTime() > point.getTime()) throw new RuntimeException("时间序列错误");
+        public int removeExpiredPoint(long refTime) {
+            int size = 0;
+            while (removeHeadPointIfExpired(refTime)) size++;
+            return size;
         }
 
         /**
          * 检查points中的队首元素是否过期 如果过期便将其移除
          * 否则不做操作 过期是指队首元素的时间比参考时间早expired或更早
-         * 注意，此方法为单线程版 多线程使用请自行加锁
          *
          * @param refTime 参考时间，判断是否过期的时间依据
          * @return 成功移除返回true 否则false
          */
         private boolean removeHeadPointIfExpired(long refTime) {
             if (points.size() == 0) return false;
-            GpsSample point = points.peekFirst();
+            GpsSample point = points.first();
             //队首元素过期
             if (refTime - point.getTime() >= expired) {
-                points.removeFirst();
+                points.pollFirst();
                 return true;
             }
             return false;
@@ -233,13 +339,18 @@ public class GpsSampleCache implements IGpsSampleCache{
          * 根据点集更新rectangle 使得rectangle成为可以覆盖points的最小矩形
          */
         private void updateRectangleByPoints() {
-            if (points.size() == 0) throw new RuntimeException("外接矩形更新错误");
+            if (points.size() == 0) {
+                rectangle = null;
+                return;
+            }
             //寻找最大最小经纬度并更新
             float minX = Float.MAX_VALUE, minY = Float.MAX_VALUE,
                     maxX = -1, maxY = -1;
+            if (rectangle == null) rectangle = new Rectangle();
+
             //点集中只有一个点 用当前点和匀直运动一秒后的点数据构成rect
             if (points.size() == 1) {
-                GpsSample point = points.getFirst();
+                GpsSample point = points.first();
                 minX = (float) point.getLng();
                 maxX = (float) (point.getLng() + point.getVlng());
                 minY = (float) point.getLat();
@@ -268,55 +379,36 @@ public class GpsSampleCache implements IGpsSampleCache{
         }
 
         /**
-         * 获取可以覆盖点集中所有点的最小矩形 因为在修改数据的时候(addPoint)就完成了对矩形的更新
-         * 所以这里只是简单地做边界判断和线程同步
+         * 获取可以覆盖点集中所有点的最小矩形
+         * 因为在修改数据的时候{@link PointSet#addPoint(GpsSample)}就完成了对矩形的更新
+         * 所以这里只是
          *
-         * @return 可以覆盖点集中所有点的最小矩形
+         * @return 可以覆盖点集中所有点的最小矩形 当点集中没有数据的时候返回null
          */
         public Rectangle getRectangle() {
-            lock.readLock().lock();
-            if (isRectModified()) {
-                lock.readLock().unlock();
-                throw new RuntimeException("获取矩形时发生错误，请确认PointSet中包含数据");
-            }
-            //TODO 关于rectangle的回收池？
+            if (rectangle == null) return null;
             Rectangle result = rectangle.copy();
-            //TODO debug method can remove
-            beforeUnlockRead(result);
-            lock.readLock().unlock();
             return result;
         }
 
         /**
          * 获取点集中所有的点 以数组的方式呈现
-         * @return
+         *
+         * @return 在某些情况下 可能没有数据 此时返回null
          */
         public GpsSample[] getPath() {
-            lock.readLock().lock();
             int size = points.size();
-            if(size == 0) {
-                lock.readLock().unlock();
-                throw new RuntimeException("PointSet中没有数据");
-            }
-            GpsSample[] result = points.toArray(new GpsSample[points.size()]);
-            lock.readLock().unlock();
+            if (size == 0) return null;
+            GpsSample[] result = points.toArray(new GpsSample[size]);
             return result;
         }
 
-        private boolean isRectModified() {
-            return rectangle.minX == Float.MAX_VALUE &&
-                    rectangle.minY == Float.MAX_VALUE &&
-                    rectangle.maxX == -Float.MAX_VALUE &&
-                    rectangle.maxY == -Float.MAX_VALUE;
+        public Lock writeLock() {
+            return lock.writeLock();
         }
 
-
-        protected void beforeUnLockWrite(GpsSample point) {
-
-        }
-
-        protected void beforeUnlockRead(Rectangle result) {
-
+        public Lock readLock() {
+            return lock.readLock();
         }
     }
 }
