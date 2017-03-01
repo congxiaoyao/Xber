@@ -67,13 +67,19 @@
             JOIN tab_car c ON u.user_id = c.user_id
                               AND user_type = 1
                               AND car_id NOT IN (
-            SELECT car_id
+            SELECT
+                car_id
             FROM
                 tab_task
             WHERE
-                start_time NOT BETWEEN #{startTime} AND #{endTime}
-                AND end_time NOT BETWEEN #{startTime} AND #{endTime}
-                AND `status` NOT IN (0, 1)
+                (
+                    start_time BETWEEN #{start_time}
+                    AND #{end_time}
+                    OR end_time BETWEEN #{start_time}
+                    AND #{end_time}
+                    OR #{start_time} BETWEEN start_time AND end_time
+                    OR #{end_time} BETWEEN start_time AND end_time)
+                AND `status` IN (0, 1)
         )
     </select>
     <select id="selectCarsOnMission" resultMap="CarDetailMap">
