@@ -73,12 +73,10 @@
                 tab_task
             WHERE
                 (
-                    start_time BETWEEN #{start_time}
-                    AND #{end_time}
-                    OR end_time BETWEEN #{start_time}
-                    AND #{end_time}
-                    OR #{start_time} BETWEEN start_time AND end_time
-                    OR #{end_time} BETWEEN start_time AND end_time)
+                      start_time BETWEEN #{startTime} AND #{endTime}
+                    OR end_time BETWEEN #{startTime} AND #{endTime}
+                    OR #{startTime} BETWEEN start_time AND end_time
+                    OR #{endTime} BETWEEN start_time AND end_time)
                 AND `status` IN (0, 1)
         )
     </select>
