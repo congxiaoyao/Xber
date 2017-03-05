@@ -20,18 +20,17 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
     @Override
     public boolean beforeHandshake(ServerHttpRequest request, ServerHttpResponse response, WebSocketHandler wsHandler, Map<String, Object> attributes) throws Exception {
         logger.debug(request.getRemoteAddress() + " connecting;headers" + request.getHeaders());
-//        List<String> tokens = request.getHeaders().get("Authorization");
-//        if (tokens.size() != 1) {
-//            return false;
-//        }
-//        try {
-//            StatelessAuthcFilter.checkToken(tokens.get(0));
-//            return true;
-//        } catch (Exception e) {
-//            logger.debug("authenticate error, " + e);
-//            return false;
-//        }
-        return true;
+        List<String> tokens = request.getHeaders().get("Authorization");
+        if (tokens.size() != 1) {
+            return false;
+        }
+        try {
+            StatelessAuthcFilter.checkToken(tokens.get(0));
+            return true;
+        } catch (Exception e) {
+            logger.debug("authenticate error, " + e);
+            return false;
+        }
     }
 
     @Override
