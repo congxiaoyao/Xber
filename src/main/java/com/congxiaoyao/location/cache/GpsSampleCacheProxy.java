@@ -68,7 +68,7 @@ public class GpsSampleCacheProxy implements IGpsSampleCache {
         return gpsSampleCache.getTraceByCarIds(carIds);
     }
 
-    @Scheduled(fixedRate = 10000L)
+    @Scheduled(fixedRate = 30 * 1000L)
     void autoClearCache() {
         gpsSampleCache.clearExpired();
     }

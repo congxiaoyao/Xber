@@ -15,8 +15,6 @@ import javax.annotation.Resource;
 @RestController
 public class LocationController {
     private static final Logger logger = LoggerFactory.getLogger(LocationController.class);
-    @Autowired
-    private LocationService locationService;
     @Resource(name = "gpsSampleCacheProxy")
     private IGpsSampleCache gpsSampleCache;
 
