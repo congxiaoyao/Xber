@@ -51,7 +51,6 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                     String destination = nativeHeaders.get("destination").getFirst();
                     Map<String, Object> map = new TreeMap<>();
                     map.put("is_subscribe_callback", "true");
-                    //TODO 依赖注入？？ 你看着弄吧。。
                     new SimpMessagingTemplate(channel).convertAndSend(destination,
                             "SUBSCRIBE RECEIPTED".getBytes(), map);
                 }

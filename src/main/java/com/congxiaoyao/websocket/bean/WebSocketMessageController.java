@@ -2,20 +2,18 @@ package com.congxiaoyao.websocket.bean;
 
 import com.congxiaoyao.location.cache.IGpsSampleCache;
 import com.congxiaoyao.location.pojo.CarsQueryMessage;
+import com.congxiaoyao.location.pojo.NearestNCarsQueryMessage;
 import com.congxiaoyao.util.GPSEncoderUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.messaging.converter.ByteArrayMessageConverter;
-import org.springframework.messaging.converter.SimpleMessageConverter;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
-import java.util.Comparator;
 import java.util.List;
 
 import static com.congxiaoyao.location.pojo.GpsSampleOuterClass.GpsSample;
@@ -79,24 +77,38 @@ public class WebSocketMessageController {
      *
      * @param queryMessage
      */
-    @MessageMapping("/nearestNCars")
-    public void getCarsPresent(CarsQueryMessage queryMessage) {
+    @MessageMapping("/trace/nearestNCars")
+    public void getCarsPresent(NearestNCarsQueryMessage queryMessage) {
+        logger.info("Cars Request Received: {}", queryMessage);
         List<GpsSample[]> carsList = gpsSampleCache.nearestN(queryMessage.getLongitude(), queryMessage.getLongitude(),
                 queryMessage.getNumber(), queryMessage.getRadius());
-        if (logger.isInfoEnabled()) {
-            logger.info("Cars Request Received: " + queryMessage);
-        }
-        //TODO 依赖注入
         simpMessagingTemplate.setMessageConverter(new ByteArrayMessageConverter());
         for (GpsSample[] samples : carsList) {
             byte[] payload = mergeGpsSamples(samples, queryMessage.getQueryId());
             simpMessagingTemplate.convertAndSendToUser(queryMessage.getUserId().toString(),
-                    "/nearestNCars", payload);
-            if (logger.isInfoEnabled()) {
-                logger.info("Response for user:" + queryMessage.getUserId()
-                        + " for query:" + queryMessage.getQueryId());
-                logger.info("Payload length: " + payload.length);
-            }
+                    "/trace/nearestNCars", payload);
+            logger.info("Response for user:{} for query:{}", queryMessage.getUserId()
+                    , queryMessage.getQueryId());
+            logger.info("Payload length: {}", payload.length);
+        }
+    }
+
+    /**
+     * 根据车辆id查询车辆轨迹
+     * @param queryMessage
+     */
+    @MessageMapping("/trace/cars")
+    public void getCarsByIds(CarsQueryMessage queryMessage) {
+        logger.info("Cars Request Received: {}", queryMessage);
+        List<GpsSample[]> traces = gpsSampleCache.getTraceByCarIds(queryMessage.getCarIds());
+        simpMessagingTemplate.setMessageConverter(new ByteArrayMessageConverter());
+        for (GpsSample[] samples : traces) {
+            byte[] payload = mergeGpsSamples(samples, queryMessage.getQueryId());
+            simpMessagingTemplate.convertAndSendToUser(queryMessage.getUserId().toString(),
+                    "/trace/cars", payload);
+            logger.info("Response for user:{} for query:{}", queryMessage.getUserId()
+                    , queryMessage.getQueryId());
+            logger.info("Payload length: {}", payload.length);
         }
     }
 
