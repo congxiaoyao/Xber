@@ -1,7 +1,7 @@
 package com.congxiaoyao.websocket.bean;
 
 import com.congxiaoyao.location.cache.IGpsSampleCache;
-import com.congxiaoyao.location.pojo.CarsQueryMessage;
+import com.congxiaoyao.location.pojo.SpecifiedCarsQueryMessage;
 import com.congxiaoyao.location.pojo.NearestNCarsQueryMessage;
 import com.congxiaoyao.util.GPSEncoderUtils;
 import org.slf4j.Logger;
@@ -97,15 +97,15 @@ public class WebSocketMessageController {
      * 根据车辆id查询车辆轨迹
      * @param queryMessage
      */
-    @MessageMapping("/trace/cars")
-    public void getCarsByIds(CarsQueryMessage queryMessage) {
+    @MessageMapping("/trace/specifiedCars")
+    public void getCarsByIds(SpecifiedCarsQueryMessage queryMessage) {
         logger.info("Cars Request Received: {}", queryMessage);
         List<GpsSample[]> traces = gpsSampleCache.getTraceByCarIds(queryMessage.getCarIds());
         simpMessagingTemplate.setMessageConverter(new ByteArrayMessageConverter());
         for (GpsSample[] samples : traces) {
             byte[] payload = mergeGpsSamples(samples, queryMessage.getQueryId());
             simpMessagingTemplate.convertAndSendToUser(queryMessage.getUserId().toString(),
-                    "/trace/cars", payload);
+                    "/trace/specifiedCars", payload);
             logger.info("Response for user:{} for query:{}", queryMessage.getUserId()
                     , queryMessage.getQueryId());
             logger.info("Payload length: {}", payload.length);
@@ -120,13 +120,13 @@ public class WebSocketMessageController {
      * @return
      */
     private byte[] mergeGpsSamples(GpsSample[] samples, long queryId) {
-        int length = samples.length;
-        if (samples == null || length == 0) {
+        if (samples == null || samples.length == 0) {
             if (logger.isDebugEnabled()) {
                 logger.warn("no GpsSample data to merge");
             }
             return new byte[0];
         }
+        int length = samples.length;
         byte[][] byteMatrix = new byte[length][];
         int resLen = length - 1;
         for (int i = 0; i < length; i++) {
