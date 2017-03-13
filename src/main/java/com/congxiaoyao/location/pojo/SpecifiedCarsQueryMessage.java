@@ -5,7 +5,7 @@ import java.util.List;
 /**
  * Created by Jaycejia on 2017/3/12.
  */
-public class CarsQueryMessage {
+public class SpecifiedCarsQueryMessage {
     private Long userId;//用户id
     private Long queryId;//查询id
     private List<Long> carIds;//车辆id
@@ -36,7 +36,7 @@ public class CarsQueryMessage {
 
     @Override
     public String toString() {
-        return "CarsQueryMessage{" +
+        return "SpecifiedCarsQueryMessage{" +
                 "userId=" + userId +
                 ", queryId=" + queryId +
                 ", carIds=" + carIds +
