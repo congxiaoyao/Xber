@@ -14,5 +14,6 @@ public interface TaskDetailMapper {
                                  @Param("startIndex") Integer startIndex,
                                  @Param("pageSize") Integer pageSize,
                                  @Param("status") Integer status,
-                                 @Param("timestamp") Date timestamp);
+                                 @Param("timestamp") Date timestamp,
+                                 @Param("createUserId") Long createUserId);
 }

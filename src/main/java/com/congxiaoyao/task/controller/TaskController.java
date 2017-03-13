@@ -55,8 +55,8 @@ public class TaskController {
      * @return
      */
     @RequestMapping(value = "/task", method = RequestMethod.GET)
-    public TaskListRsp getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp) {
-        List<Task> tasks = taskService.getTask(userId, pageIndex, pageSize, status, timestamp);
+    public TaskListRsp getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp, Long createUserId) {
+        List<Task> tasks = taskService.getTask(userId, pageIndex, pageSize, status, timestamp, createUserId);
         List<TaskRsp> taskRsps = new ArrayList<>();
         for (Task task : tasks) {
             TaskRsp taskRsp = new TaskRsp(task);

@@ -18,7 +18,7 @@ public interface TaskService {
      * @param pageIndex
      * @param pageSize
      */
-    List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp);
+    List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp, Long createUserId);
 
     /**
      * 改变任务状态

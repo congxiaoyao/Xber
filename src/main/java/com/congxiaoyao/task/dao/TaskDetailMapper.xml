@@ -24,9 +24,14 @@
         SELECT
         <include refid="Base_Column_List"/>
         FROM tab_car c JOIN tab_task t ON c.car_id = t.car_id
-        WHERE user_id = #{userId}
+        <if test="userId !=null">
+            WHERE user_id = #{userId}
+        </if>
         <if test="status != null">
             AND status = #{status}
+        </if>
+        <if test="createUserId != null">
+            ANd create_user = #{createUserId}
         </if>
         <if test="timestamp != null">
             <![CDATA[
