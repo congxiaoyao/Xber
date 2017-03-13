@@ -30,6 +30,9 @@
         <if test="status != null">
             AND status = #{status}
         </if>
+        <if test="createUserId != null">
+            ANd create_user = #{createUserId}
+        </if>
         <if test="timestamp != null">
             <![CDATA[
              AND t.create_time <= #{timestamp}

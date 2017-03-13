@@ -46,8 +46,8 @@ public class TaskServiceImpl implements TaskService {
      * @param pageSize
      */
     @Override
-    public List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp) {
-        return detailMapper.selectByCondition(userId, pageIndex * pageSize, pageSize, status, timestamp);
+    public List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp, Long createUserId) {
+        return detailMapper.selectByCondition(userId, pageIndex * pageSize, pageSize, status, timestamp, createUserId);
     }
 
     /**
