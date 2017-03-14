@@ -8,13 +8,15 @@ import java.util.List;
  */
 public class TaskListRsp {
     private Date timestamp;
+    private Page page;
     private List<TaskRsp> taskList;
 
     public TaskListRsp() {
     }
 
-    public TaskListRsp(Date timestamp, List<TaskRsp> taskList) {
+    public TaskListRsp(Date timestamp, Page page, List<TaskRsp> taskList) {
         this.timestamp = timestamp;
+        this.page = page;
         this.taskList = taskList;
     }
 
@@ -32,5 +34,22 @@ public class TaskListRsp {
 
     public void setTaskList(List<TaskRsp> taskList) {
         this.taskList = taskList;
+    }
+
+    public Page getPage() {
+        return page;
+    }
+
+    public void setPage(Page page) {
+        this.page = page;
+    }
+
+    @Override
+    public String toString() {
+        return "TaskListRsp{" +
+                "timestamp=" + timestamp +
+                ", page=" + page +
+                ", taskList=" + taskList +
+                '}';
     }
 }

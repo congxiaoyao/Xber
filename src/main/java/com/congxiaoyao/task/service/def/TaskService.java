@@ -21,6 +21,12 @@ public interface TaskService {
     List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp, Long createUserId);
 
     /**
+     * 根据时间戳获取任务总数
+     * @param timestamp
+     * @return
+     */
+    Long getTaskCount(Date timestamp);
+    /**
      * 改变任务状态
      * @param taskId
      * @param status

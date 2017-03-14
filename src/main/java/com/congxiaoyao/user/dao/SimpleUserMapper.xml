@@ -76,7 +76,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from tab_user_copy
+    from tab_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -87,21 +87,21 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from tab_user_copy
+    from tab_user
     where user_id = #{userId,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from tab_user_copy
+    delete from tab_user
     where user_id = #{userId,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.congxiaoyao.user.pojo.SimpleUserExample">
-    delete from tab_user_copy
+    delete from tab_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.congxiaoyao.user.pojo.SimpleUser">
-    insert into tab_user_copy (user_id, username, password, 
+    insert into tab_user (user_id, username, password, 
       salt, name, user_type
       )
     values (#{userId,jdbcType=BIGINT}, #{username,jdbcType=VARCHAR}, #{password,jdbcType=VARCHAR}, 
@@ -109,7 +109,7 @@
       )
   </insert>
   <insert id="insertSelective" parameterType="com.congxiaoyao.user.pojo.SimpleUser">
-    insert into tab_user_copy
+    insert into tab_user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="userId != null">
         user_id,
@@ -152,13 +152,13 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.congxiaoyao.user.pojo.SimpleUserExample" resultType="java.lang.Long">
-    select count(*) from tab_user_copy
+    select count(*) from tab_user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update tab_user_copy
+    update tab_user
     <set>
       <if test="record.userId != null">
         user_id = #{record.userId,jdbcType=BIGINT},
@@ -184,7 +184,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update tab_user_copy
+    update tab_user
     set user_id = #{record.userId,jdbcType=BIGINT},
       username = #{record.username,jdbcType=VARCHAR},
       password = #{record.password,jdbcType=VARCHAR},
@@ -196,7 +196,7 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.congxiaoyao.user.pojo.SimpleUser">
-    update tab_user_copy
+    update tab_user
     <set>
       <if test="username != null">
         username = #{username,jdbcType=VARCHAR},
@@ -217,7 +217,7 @@
     where user_id = #{userId,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.congxiaoyao.user.pojo.SimpleUser">
-    update tab_user_copy
+    update tab_user
     set username = #{username,jdbcType=VARCHAR},
       password = #{password,jdbcType=VARCHAR},
       salt = #{salt,jdbcType=VARCHAR},
