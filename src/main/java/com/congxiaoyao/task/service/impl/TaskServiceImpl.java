@@ -8,6 +8,7 @@ import com.congxiaoyao.task.dao.TaskDetailMapper;
 import com.congxiaoyao.task.dao.TaskMapper;
 import com.congxiaoyao.task.pojo.LaunchTaskRequest;
 import com.congxiaoyao.task.pojo.Task;
+import com.congxiaoyao.task.pojo.TaskExample;
 import com.congxiaoyao.task.service.def.TaskService;
 import com.congxiaoyao.user.pojo.BasicUserInfo;
 import org.slf4j.Logger;
@@ -48,6 +49,20 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<Task> getTask(Long userId, Integer pageIndex, Integer pageSize, Integer status, Date timestamp, Long createUserId) {
         return detailMapper.selectByCondition(userId, pageIndex * pageSize, pageSize, status, timestamp, createUserId);
+    }
+
+    /**
+     * 根据时间戳获取任务总数
+     *
+     * @param timestamp
+     * @return
+     */
+    @Override
+    public Long getTaskCount(Date timestamp) {
+        TaskExample example = new TaskExample();
+        TaskExample.Criteria criteria = example.createCriteria();
+        criteria.andCreateTimeLessThanOrEqualTo(timestamp);
+        return taskMapper.countByExample(example);
     }
 
     /**
