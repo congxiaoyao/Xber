@@ -1,5 +1,7 @@
 package com.congxiaoyao.websocket.bean;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
@@ -20,6 +22,8 @@ import java.util.TreeMap;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
+
+    private final Logger logger = LoggerFactory.getLogger(WebSocketConfig.class);
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
@@ -49,6 +53,7 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                     Map<String, LinkedList<String>> nativeHeaders = (Map<String,
                             LinkedList<String>>) headers.get("nativeHeaders");
                     String destination = nativeHeaders.get("destination").getFirst();
+                    logger.info("subscribe path " + destination);
                     Map<String, Object> map = new TreeMap<>();
                     map.put("is_subscribe_callback", "true");
                     new SimpMessagingTemplate(channel).convertAndSend(destination,
