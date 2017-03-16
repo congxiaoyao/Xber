@@ -7,6 +7,7 @@ import com.congxiaoyao.auth.pojo.StatelessSession;
 import com.congxiaoyao.auth.service.def.SessionService;
 import com.congxiaoyao.auth.token.StatelessToken;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.IncorrectCredentialsException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.web.filter.AccessControlFilter;
 import org.slf4j.Logger;
@@ -53,7 +54,13 @@ public class StatelessAuthcFilter extends AccessControlFilter {
         if (logger.isTraceEnabled()) {
             logger.trace(exp.getMessage(), exp);
         }
-        request.setAttribute("shiroLoginFailure", exp);
+        Exception e;
+        if (exp instanceof IncorrectCredentialsException) {
+            e = new InvalidTokenException(exp);
+        } else {
+            e = exp;
+        }
+        request.setAttribute("shiroLoginFailure", e);
     }
 
     public static StatelessToken checkToken(String requestMessage) {
