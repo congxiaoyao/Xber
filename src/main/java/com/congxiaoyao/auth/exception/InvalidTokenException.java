@@ -10,4 +10,8 @@ public class InvalidTokenException extends AuthenticationException implements Cu
     public InvalidTokenException() {
         super("token无效");
     }
+
+    public InvalidTokenException(Throwable cause) {
+        super(cause);
+    }
 }

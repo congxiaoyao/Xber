@@ -1,6 +1,8 @@
 package com.congxiaoyao.user.pojo;
 
-public class SimpleUser {
+import java.io.Serializable;
+
+public class SimpleUser implements Serializable{
     private Long userId;
 
     private String username;

@@ -18,8 +18,10 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Jaycejia on 2016/12/4.
@@ -61,10 +63,11 @@ public class SessionServiceImpl implements SessionService {
     @Override
     public void register(StatelessSession session) throws Exception {
         clearAuthCache(session);
-        if (!userHasLogin(session.getUserId())) {
+        List<StatelessSession> sessions = sessionMapper.selectByExample(getExampleBySession(session));
+        if (!(userHasLogin(session.getUserId()) || sessions.size() > 0)) {
             sessionMapper.insert(session);
         } else {
-            clean(sessionMapper.selectByExample(getExampleBySession(session)).get(0));
+            clean(sessions.get(0));
             sessionMapper.insert(session);
         }
     }
@@ -123,7 +126,8 @@ public class SessionServiceImpl implements SessionService {
      * @param session
      */
     private void clearAuthCache(StatelessSession session) {
-        PrincipalCollection collection = new SimplePrincipalCollection(session.getClientId(), realm.getName());
+        List<Object> principalList = Arrays.asList(new Object[]{session.getClientId(),userService.getUser(session.getUserId())});
+        PrincipalCollection collection = new SimplePrincipalCollection(principalList, realm.getName());
         realm.doClearCache(collection);
     }
 }
