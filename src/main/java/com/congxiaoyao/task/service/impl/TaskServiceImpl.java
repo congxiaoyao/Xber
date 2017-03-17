@@ -58,11 +58,8 @@ public class TaskServiceImpl implements TaskService {
      * @return
      */
     @Override
-    public Long getTaskCount(Date timestamp) {
-        TaskExample example = new TaskExample();
-        TaskExample.Criteria criteria = example.createCriteria();
-        criteria.andCreateTimeLessThanOrEqualTo(timestamp);
-        return taskMapper.countByExample(example);
+    public Long getTaskCount(Long userId, Integer status, Date timestamp, Long createUserId) {
+        return detailMapper.countByCondition(userId, status, timestamp, createUserId);
     }
 
     /**

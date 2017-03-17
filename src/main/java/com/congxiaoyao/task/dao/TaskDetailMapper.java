@@ -16,4 +16,9 @@ public interface TaskDetailMapper {
                                  @Param("status") Integer status,
                                  @Param("timestamp") Date timestamp,
                                  @Param("createUserId") Long createUserId);
+
+    Long countByCondition(@Param("userId") Long userId,
+                          @Param("status") Integer status,
+                          @Param("timestamp") Date timestamp,
+                          @Param("createUserId") Long createUserId);
 }
