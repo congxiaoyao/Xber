@@ -40,4 +40,22 @@
         ORDER BY create_time DESC
         LIMIT ${startIndex}, ${pageSize}
     </select>
+    <select id="countByCondition" resultType="java.lang.Long">
+        SELECT
+          COUNT(*)
+        FROM tab_car c JOIN tab_task t ON c.car_id = t.car_id
+        <if test="userId !=null">
+            WHERE user_id = #{userId}
+        </if>
+        <if test="status != null">
+            AND status = #{status}
+        </if>
+        <if test="createUserId != null">
+            ANd create_user = #{createUserId}
+        </if>
+        <if test="timestamp != null">
+            <![CDATA[
+             AND t.create_time <= #{timestamp}
+            ]]></if>
+    </select>
 </mapper>

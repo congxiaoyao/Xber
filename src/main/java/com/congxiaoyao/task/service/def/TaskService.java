@@ -22,10 +22,11 @@ public interface TaskService {
 
     /**
      * 根据时间戳获取任务总数
+     *
      * @param timestamp
      * @return
      */
-    Long getTaskCount(Date timestamp);
+    Long getTaskCount(Long userId, Integer status, Date timestamp, Long createUserId);
     /**
      * 改变任务状态
      * @param taskId

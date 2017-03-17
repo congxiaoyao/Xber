@@ -68,7 +68,12 @@ public class TaskController {
         if (timestamp == null) {
             timestamp = new Date();
         }
-        return new TaskListRsp(timestamp, new Page(pageIndex, pageIndex + 1, tasks.size(), taskService.getTaskCount(timestamp)), taskRsps);
+        Long total = taskService.getTaskCount(userId, status, timestamp, createUserId);
+        int next = pageIndex + 1;
+        if (pageIndex * pageSize + pageSize >= total) {
+            next = -1;
+        }
+        return new TaskListRsp(timestamp, new Page(pageIndex, next, tasks.size(), total), taskRsps);
     }
 
     /**

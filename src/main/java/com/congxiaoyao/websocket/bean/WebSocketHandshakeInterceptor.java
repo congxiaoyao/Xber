@@ -33,7 +33,7 @@ public class WebSocketHandshakeInterceptor implements HandshakeInterceptor {
             return true;
         } catch (Exception e) {
             logger.debug("authenticate error, " + e);
-            response.setStatusCode(HttpStatus.INTERNAL_SERVER_ERROR);
+            response.setStatusCode(HttpStatus.FORBIDDEN);
             return false;
         }
     }
