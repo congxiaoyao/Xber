@@ -10,6 +10,7 @@ import java.util.List;
 public interface SpotService {
     /**
      * 根据spot Id 获取spot
+     *
      * @param spotId
      * @return
      */
@@ -17,7 +18,31 @@ public interface SpotService {
 
     /**
      * 获取所有的地点
+     *
      * @return
      */
     List<Spot> getSpots();
+
+    /**
+     * 添加spot
+     *
+     * @param spot
+     * @return
+     */
+    int addSpot(Spot spot);
+
+    /**
+     * 根据id删除spot
+     *
+     * @param id
+     * @return
+     */
+    int removeSpotById(Long id);
+
+    /**
+     * 更新spot
+     * @param spot
+     * @return
+     */
+    int updateSpot(Spot spot);
 }

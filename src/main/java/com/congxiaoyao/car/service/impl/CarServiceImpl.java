@@ -111,6 +111,16 @@ public class CarServiceImpl implements CarService {
     }
 
     /**
+     * 获得所有的司机信息
+     *
+     * @return
+     */
+    @Override
+    public List<CarDetail> getAllDrivers() {
+        return carUserMapper.selectDrivers();
+    }
+
+    /**
      * 设置车辆司机
      *
      * @param carId

@@ -99,5 +99,10 @@ public class CarController {
         carService.changeCarDriver(req.getCarId(), req.getUserId());
         return "操作成功";
     }
+
+    @RequestMapping(value = "/car/driver", method = RequestMethod.GET)
+    public List<CarDetail> getAllCarDrivers() {
+        return carService.getAllDrivers();
+    }
 }
 

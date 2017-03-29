@@ -78,6 +78,12 @@ public interface CarService {
     List<CarDetail> getCarsByUserName(String name);
 
     /**
+     * 获得所有的司机信息
+     * @return
+     */
+    List<CarDetail> getAllDrivers();
+
+    /**
      * 设置车辆司机
      *
      * @param carId
