@@ -38,4 +38,38 @@ public class SpotServiceImpl implements SpotService{
     public List<Spot> getSpots() {
         return spotMapper.selectByExample(new SpotExample());
     }
+
+    /**
+     * 添加spot
+     *
+     * @param spot
+     * @return
+     */
+    @Override
+    public int addSpot(Spot spot) {
+        return spotMapper.insert(spot);
+    }
+
+    /**
+     * 根据id删除spot
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public int removeSpotById(Long id) {
+        return spotMapper.deleteByPrimaryKey(id);
+    }
+
+    /**
+     * 更新spot
+     *
+     * @param spot
+     * @return
+     */
+    @Override
+    public int updateSpot(Spot spot) {
+        return spotMapper.updateByPrimaryKeySelective(spot);
+    }
+
 }
