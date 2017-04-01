@@ -3,10 +3,7 @@ package com.congxiaoyao.spot.controller;
 import com.congxiaoyao.spot.pojo.Spot;
 import com.congxiaoyao.spot.service.def.SpotService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -40,8 +37,8 @@ public class SpotController {
         return "更新成功";
     }
 
-    @RequestMapping(value = "/spot", method = RequestMethod.DELETE)
-    public String deleteSpot(@RequestBody Long id, HttpServletResponse response) {
+    @RequestMapping(value = "/spot/{id}", method = RequestMethod.DELETE)
+    public String deleteSpot(@PathVariable Long id, HttpServletResponse response) {
         int count = spotService.removeSpotById(id);
         if (count < 1) {
             response.setStatus(HttpServletResponse.SC_NOT_FOUND);
