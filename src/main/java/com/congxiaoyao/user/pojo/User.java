@@ -1,12 +1,16 @@
 package com.congxiaoyao.user.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class User {
     private Long userId;
 
     private String username;
 
+    @JsonIgnore
     private String password;
 
+    @JsonIgnore
     private String salt;
 
     private String name;

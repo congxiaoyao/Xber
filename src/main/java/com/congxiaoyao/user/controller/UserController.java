@@ -3,10 +3,9 @@ package com.congxiaoyao.user.controller;
 import com.congxiaoyao.user.pojo.User;
 import com.congxiaoyao.user.service.def.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by Jaycejia on 2017/2/18.
@@ -26,5 +25,14 @@ public class UserController {
     public String registerDriver(@RequestBody User user) {
         userService.registerUser(user);
         return "操作成功";
+    }
+
+    @RequestMapping(value = "/user/{userId}", method = RequestMethod.GET)
+    public User getUserDetail(@PathVariable Long userId, HttpServletResponse response) throws Exception {
+        User userDetail = userService.getUserDetail(userId);
+        if (userDetail == null) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+        return userDetail;
     }
 }
