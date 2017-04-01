@@ -10,6 +10,8 @@ import java.util.Date;
 public class TaskRsp {
     private Long taskId;
 
+    private Long carId;
+
     private Date startTime;
 
     private Spot startSpot;
@@ -34,6 +36,7 @@ public class TaskRsp {
 
     public TaskRsp(Task task) {
         this.taskId = task.getTaskId();
+        this.carId = task.getCarId();
         this.startTime = task.getStartTime();
         this.endTime = task.getEndTime();
         this.content = task.getContent();
@@ -53,6 +56,13 @@ public class TaskRsp {
         this.taskId = taskId;
     }
 
+    public void setCarId(Long carId) {
+        this.carId = carId;
+    }
+
+    private Long getCarId() {
+        return carId;
+    }
     public Date getStartTime() {
         return startTime;
     }
