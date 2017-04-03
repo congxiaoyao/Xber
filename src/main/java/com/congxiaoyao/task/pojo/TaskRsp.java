@@ -56,13 +56,14 @@ public class TaskRsp {
         this.taskId = taskId;
     }
 
+    public Long getCarId() {
+        return carId;
+    }
+
     public void setCarId(Long carId) {
         this.carId = carId;
     }
 
-    private Long getCarId() {
-        return carId;
-    }
     public Date getStartTime() {
         return startTime;
     }
