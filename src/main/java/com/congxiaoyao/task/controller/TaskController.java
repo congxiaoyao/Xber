@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -84,5 +85,21 @@ public class TaskController {
     @RequestMapping(value = "/task/trace", method = RequestMethod.GET)
     public List<GpsSamplePo> getCarTrace(Long taskId) {
         return taskService.getTrace(taskId);
+    }
+
+    /**
+     * 获取任务的最后一个位置
+     * @param taskId
+     * @param response
+     * @return
+     */
+    @RequestMapping(value = "/task/last", method = RequestMethod.GET)
+    public GpsSamplePo getLastPosition(Long taskId, HttpServletResponse response) {
+        List<GpsSamplePo> carTrace = getCarTrace(taskId);
+        if (carTrace == null || carTrace.size() == 0) {
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return null;
+        }
+        return carTrace.get(carTrace.size() - 1);
     }
 }

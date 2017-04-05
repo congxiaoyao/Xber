@@ -27,6 +27,7 @@
             time
         FROM tab_position_trace
         WHERE task_id = #{taskId}
+        ORDER BY time ASC
     </select>
     <insert id="insertSample" parameterType="com.congxiaoyao.location.pojo.GpsSamplePo">
         INSERT INTO tab_position_trace (
