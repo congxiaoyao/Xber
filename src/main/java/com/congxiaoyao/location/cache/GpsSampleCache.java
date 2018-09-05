@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.congxiaoyao.location.pojo.GpsSampleOuterClass.GpsSample;
 
@@ -38,7 +40,7 @@ public class GpsSampleCache implements IGpsSampleCache{
     }
 
     public GpsSampleCache() {
-        init(5000);
+        init(20_1000);
     }
 
     private void init(int expired) {
@@ -254,6 +256,22 @@ public class GpsSampleCache implements IGpsSampleCache{
         return result;
     }
 
+    @Override
+    public List<Long> findRunningCars(List<Long> carIds) {
+        removeLock.readLock().lock();
+        List<Long> result;
+        try {
+            result = carIds.stream().filter(carId -> carId < Integer.MAX_VALUE)
+                    .mapToInt(Long::intValue)
+                    .filter(carId -> Stream.of(carId).findFirst().map(latestData::get).isPresent())
+                    .mapToLong(Integer::toUnsignedLong)
+                    .collect(ArrayList::new, List::add, List::addAll);
+        } finally {
+            removeLock.readLock().unlock();
+        }
+        return result;
+    }
+
     /**
      * 设置过期时间
      *
@@ -303,6 +321,11 @@ public class GpsSampleCache implements IGpsSampleCache{
          * @param point
          */
         public void addPoint(GpsSample point) {
+            //比最早的数据早expired 那就没必要添加了
+            if (!points.isEmpty() &&
+                    points.first().getTime() - point.getTime() >= expired) {
+                return;
+            }
             //添加新节点至队列
             points.add(point);
             //删除过期节点

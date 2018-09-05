@@ -20,9 +20,11 @@ public class CarController {
     private CarService carService;
 
     @RequestMapping(value = "/car", method = RequestMethod.POST)
-    public void addCar(@RequestBody NewCar car) {
+    public String addCar(@RequestBody NewCar car) {
         carService.addCar(car);
+        return "添加成功";
     }
+
     /**
      * 根据car id获取车辆信息
      *
@@ -32,6 +34,17 @@ public class CarController {
     @RequestMapping(value = "/car", method = RequestMethod.GET)
     public CarDetail getCarInfo(Long carId) {
         return carService.getCarInfo(carId);
+    }
+
+    /**
+     * 根据user id获取车辆信息
+     *
+     * @param userId
+     * @return
+     */
+    @RequestMapping(value = "/car/user", method = RequestMethod.GET)
+    public CarDetail getCarInfoByUserId(Long userId) {
+        return carService.getDriverDetail(userId);
     }
 
     /**

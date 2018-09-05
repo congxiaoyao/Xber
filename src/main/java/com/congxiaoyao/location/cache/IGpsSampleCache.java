@@ -57,6 +57,8 @@ public interface IGpsSampleCache {
      */
     List<GpsSampleOuterClass.GpsSample[]> getTraceByCarIds(List<Long> carIds);
 
+    List<Long> findRunningCars(List<Long> carIds);
+
     /**
      * 设置过期时间
      *

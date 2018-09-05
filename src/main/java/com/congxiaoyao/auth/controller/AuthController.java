@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Created by Jaycejia on 2016/12/4.
@@ -39,6 +40,17 @@ public class AuthController {
         AuthenticateInfo authcInfo = (AuthenticateInfo) request.getAttribute("authcInfo");
         loginInfoRsp.setAuthToken(sessionService.registerAccessToken(authcInfo));
         return loginInfoRsp;
+    }
+
+    /**
+     * 用于处理登录的controller
+     *
+     * @return
+     */
+    @RequestMapping(value = "/login1", method = RequestMethod.GET)
+    public LoginInfoRsp generateToken1(HttpServletResponse response) throws Exception {
+        response.getWriter().print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        return null;
     }
 
 

@@ -2,6 +2,8 @@ package com.congxiaoyao.spot.controller;
 
 import com.congxiaoyao.spot.pojo.Spot;
 import com.congxiaoyao.spot.service.def.SpotService;
+import com.congxiaoyao.user.pojo.SimpleUser;
+import com.congxiaoyao.user.service.def.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,10 +17,17 @@ import java.util.List;
 public class SpotController {
     @Autowired
     private SpotService spotService;
+    @Autowired
+    private UserService userService;
 
     @RequestMapping(value = "/spot/all", method = RequestMethod.GET)
     public List<Spot> getAllSpots() {
         return spotService.getSpots();
+    }
+
+    @RequestMapping(value = "/spot/user", method = RequestMethod.GET)
+    public SimpleUser getUser(String name) {
+        return userService.getUserByName(name);
     }
 
     @RequestMapping(value = "/spot", method = RequestMethod.POST)

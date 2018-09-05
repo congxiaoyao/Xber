@@ -1,14 +1,14 @@
 package com.congxiaoyao.task.controller;
 
+import com.congxiaoyao.location.dao.GpsSamplePoMapper;
+import com.congxiaoyao.location.dao.LatLngConverter;
+import com.congxiaoyao.location.dao.LatLngMapper;
 import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.spot.service.def.SpotService;
 import com.congxiaoyao.task.pojo.*;
 import com.congxiaoyao.task.service.def.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -46,6 +46,16 @@ public class TaskController {
     public String changeTaskStatus(@RequestBody StatusChangeRequest request) {
         taskService.changeTaskStatus(request.getTaskId(), request.getStatus());
         return "操作成功";
+    }
+
+    @RequestMapping(value = "/task/{taskId}", method = RequestMethod.GET)
+    public TaskRsp getTask(@PathVariable Long taskId) {
+        Task task = taskService.getTask(taskId);
+        if (task == null) return null;
+        TaskRsp taskRsp = new TaskRsp(task);
+        taskRsp.setStartSpot(spotService.getSpotById(task.getStartSpot()));
+        taskRsp.setEndSpot(spotService.getSpotById(task.getEndSpot()));
+        return taskRsp;
     }
 
     /**
@@ -101,5 +111,17 @@ public class TaskController {
             return null;
         }
         return carTrace.get(carTrace.size() - 1);
+    }
+
+    /**
+     * 根据任务id获取车辆历史轨迹
+     *
+     * @param taskId
+     * @return
+     */
+    @RequestMapping(value = "/task/trace/bytes", method = RequestMethod.GET)
+    public byte[] getCarTraceBytes(Long taskId) {
+        List<GpsSamplePo> trace = taskService.getTrace(taskId);
+        return LatLngConverter.init(new GpsSamplePoMapper()).toByteArray(trace);
     }
 }

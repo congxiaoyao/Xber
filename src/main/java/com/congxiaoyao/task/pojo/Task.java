@@ -25,31 +25,31 @@ public class Task {
         this.note = note;
     }
 
-    private Long taskId;
+    Long taskId;
 
-    private Long carId;
+    Long carId;
 
-    private Date startTime;
+    Date startTime;
 
-    private Long startSpot;
+    Long startSpot;
 
-    private Date endTime;
+    Date endTime;
 
-    private Long endSpot;
+    Long endSpot;
 
-    private String content;
+    String content;
 
-    private Long createUser;
+    Long createUser;
 
-    private Date createTime;
+    Date createTime;
 
-    private Date realStartTime;
+    Date realStartTime;
 
-    private Date realEndTime;
+    Date realEndTime;
 
-    private Integer status;
+    Integer status;
 
-    private String note;
+    String note;
 
     public Long getTaskId() {
         return taskId;

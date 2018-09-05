@@ -32,6 +32,8 @@ public interface CarUserMapper {
 
     List<CarDetail> selectDrivers();
 
+    CarDetail selectDriverDetail(@Param("userId") Long userId);
+
     void updateCarUser(@Param("carId") Long carId, @Param("userId") Long userId);
 
     void insertCar(NewCar car);

@@ -148,6 +148,20 @@
         FROM tab_user u
             JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
     </select>
+    <select id="selectDriverDetail" resultMap="CarDetailMap">
+        SELECT
+            c.car_id,
+            plate_no,
+            spec,
+            c.user_id,
+            NAME,
+            gender,
+            avatar,
+            age
+        FROM tab_user u
+            JOIN tab_car c ON u.user_id = c.user_id AND user_type = 1
+        WHERE u.user_id = #{userId,jdbcType=BIGINT};
+    </select>
     <update id="updateCarUser">
         UPDATE tab_car
         SET user_id = #{userId}

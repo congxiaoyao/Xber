@@ -83,6 +83,8 @@ public interface CarService {
      */
     List<CarDetail> getAllDrivers();
 
+    CarDetail getDriverDetail(Long userId);
+
     /**
      * 设置车辆司机
      *

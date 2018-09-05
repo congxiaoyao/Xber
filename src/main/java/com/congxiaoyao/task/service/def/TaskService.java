@@ -3,6 +3,7 @@ package com.congxiaoyao.task.service.def;
 import com.congxiaoyao.location.pojo.GpsSamplePo;
 import com.congxiaoyao.task.pojo.LaunchTaskRequest;
 import com.congxiaoyao.task.pojo.Task;
+import com.congxiaoyao.task.pojo.TaskRsp;
 
 import java.util.Date;
 import java.util.List;
@@ -11,6 +12,8 @@ import java.util.List;
  * Created by Jaycejia on 2017/2/18.
  */
 public interface TaskService {
+    Task getTask(Long taskId);
+
     /**
      * 获取司机运输任务
      *

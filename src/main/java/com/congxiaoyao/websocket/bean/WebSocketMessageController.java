@@ -1,5 +1,6 @@
 package com.congxiaoyao.websocket.bean;
 
+import com.congxiaoyao.common.URIConfig;
 import com.congxiaoyao.location.cache.IGpsSampleCache;
 import com.congxiaoyao.location.pojo.SpecifiedCarsQueryMessage;
 import com.congxiaoyao.location.pojo.NearestNCarsQueryMessage;
@@ -53,7 +54,7 @@ public class WebSocketMessageController {
     public void echoToUser(String userId) {
         logger.info("echo invoked, userId = " + userId);
         simpMessagingTemplate.convertAndSendToUser(userId,
-                "/sysInfo", "hello, " + userId);
+                URIConfig.USER_SYSTEM, "hello, " + userId);
     }
 
     /**
@@ -80,7 +81,7 @@ public class WebSocketMessageController {
     @MessageMapping("/trace/nearestNCars")
     public void getCarsPresent(NearestNCarsQueryMessage queryMessage) {
         logger.info("Cars Request Received: {}", queryMessage);
-        List<GpsSample[]> carsList = gpsSampleCache.nearestN(queryMessage.getLongitude(), queryMessage.getLongitude(),
+        List<GpsSample[]> carsList = gpsSampleCache.nearestN(queryMessage.getLongitude(), queryMessage.getLatitude(),
                 queryMessage.getNumber(), queryMessage.getRadius());
         simpMessagingTemplate.setMessageConverter(new ByteArrayMessageConverter());
         for (GpsSample[] samples : carsList) {

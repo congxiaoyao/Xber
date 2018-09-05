@@ -120,6 +120,11 @@ public class CarServiceImpl implements CarService {
         return carUserMapper.selectDrivers();
     }
 
+    @Override
+    public CarDetail getDriverDetail(Long userId) {
+        return carUserMapper.selectDriverDetail(userId);
+    }
+
     /**
      * 设置车辆司机
      *

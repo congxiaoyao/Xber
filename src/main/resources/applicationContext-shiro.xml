@@ -63,10 +63,16 @@
         <property name="filterChainDefinitions">
             <value>
                 <!--web相关资源-->
+                /assets/**=anon
                 /css/**=anon
                 /images/**=anon
                 /js/**=anon
                 <!--上传文件路径-->
+                /spot/**=anon
+                /user=anon
+                /car=anon
+                /car/unused=anon
+                /car/driver=anon
                 /upload/**=anon
                 /login=loginAuthc
                 /**=statelessAuthc

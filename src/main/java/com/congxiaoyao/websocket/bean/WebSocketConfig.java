@@ -18,6 +18,7 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.CompletableFuture;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -44,7 +45,8 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
         super.configureClientInboundChannel(registration);
         registration.setInterceptors(new ChannelInterceptorAdapter() {
             @Override
-            public void afterSendCompletion(Message<?> message, MessageChannel channel, boolean sent, Exception ex) {
+            public void afterSendCompletion(Message<?> message, MessageChannel channel,
+                                            boolean sent, Exception ex) {
                 MessageHeaders headers = message.getHeaders();
                 Object o = headers.get("stompCommand");
                 if (o == null) return;
@@ -56,8 +58,16 @@ public class WebSocketConfig extends AbstractWebSocketMessageBrokerConfigurer {
                     logger.info("subscribe path " + destination);
                     Map<String, Object> map = new TreeMap<>();
                     map.put("is_subscribe_callback", "true");
-                    new SimpMessagingTemplate(channel).convertAndSend(destination,
-                            "SUBSCRIBE RECEIPTED".getBytes(), map);
+                    CompletableFuture.runAsync(() -> {
+                        try {
+                            Thread.sleep(200);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                        logger.info("SUBSCRIBE RECEIPTED " + destination);
+                        new SimpMessagingTemplate(channel).convertAndSend(destination,
+                                "SUBSCRIBE RECEIPTED".getBytes(), map);
+                    });
                 }
             }
         });
